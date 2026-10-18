@@ -1,3 +1,6 @@
+<p align="center"><img src="assets/cover/cover-pt.jpg" alt="VOLT One" width="100%"></p>
+<p align="center"><img src="assets/cover/cover-en.jpg" alt="VOLT One (EN)" width="100%"></p>
+
 # VOLT One
 
 Landing page conceitual de um smartwatch fictício, com modelo 3D (Three.js) que se desmonta com a rolagem (GSAP ScrollTrigger). PT e EN.
