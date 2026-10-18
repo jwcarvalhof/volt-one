@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VOLT One</title>
+<meta name="description" content="VOLT One, um smartwatch conceitual em titânio e safira. Conheça a construção camada por camada, em 3D.">
+<meta name="theme-color" content="#04060C">
+<meta property="og:title" content="VOLT One · Além do tempo.">
+<meta property="og:description" content="Um smartwatch conceitual desmontado camada por camada, em 3D.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://volt.vercel.app/assets/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:url" content="https://volt.vercel.app/">
+<link rel="canonical" href="https://volt.vercel.app/">
+<link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/sora-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:Sora;font-weight:500;font-style:normal;font-display:swap;src:url(assets/fonts/sora-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:Sora;font-weight:600;font-style:normal;font-display:swap;src:url(assets/fonts/sora-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:Inter;font-weight:400;font-style:normal;font-display:swap;src:url(assets/fonts/inter-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:Inter;font-weight:500;font-style:normal;font-display:swap;src:url(assets/fonts/inter-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:Inter;font-weight:600;font-style:normal;font-display:swap;src:url(assets/fonts/inter-latin-600-normal.woff2) format('woff2')}
+
+/* Layout: um palco 3D fixo atrás de seções transparentes; a informação vive em caixas de vidro nos espaços vazios do enquadramento. */
+:root{
+  color-scheme:dark;
+  --canvas:#04060C; --panel:#0A0E16;
+  --accent:#2864F0; --accent-hover:#3A74FF; --glow:#6B9BFF;
+  --text:#F3F6FC; --text-2:#91A0BA; --text-3:#6f7d96;
+  --line:rgba(145,160,186,.14); --line-2:rgba(145,160,186,.38);
+  --glass:rgba(11,15,24,.42); --glass-edge:rgba(255,255,255,.09);
+  --ease:cubic-bezier(.22,.61,.36,1); --ease-io:cubic-bezier(.65,0,.35,1);
+  --gutter:clamp(20px,5vw,72px); --nav-h:68px;
+  --display:Sora,Inter,system-ui,sans-serif; --body:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden;overflow-x:clip;background:var(--canvas);-webkit-text-size-adjust:100%}
+body{overflow-x:hidden;overflow-x:clip;background:var(--canvas);color:var(--text);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+strong{color:var(--text);font-weight:600}
+:focus-visible{outline:2px solid var(--glow);outline-offset:3px;border-radius:8px}
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:fixed;left:16px;top:-60px;z-index:100;background:var(--accent);color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;transition:top .3s var(--ease)}
+.skip:focus{top:12px}
+
+/* vidro: a mesma receita para toda caixa de informação */
+.glass{background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.015) 45%,rgba(255,255,255,.03)),var(--glass);
+  border:1px solid var(--glass-edge);border-radius:24px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 70px -36px rgba(0,0,0,.8);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%)}
+
+/* ---------- palco fixo ---------- */
+.gl-wrap{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:0;pointer-events:none;background:var(--canvas)}
+#gl{display:block;width:100%;height:100%;opacity:0;transition:opacity 1.1s var(--ease)}
+.is-3d-ready #gl{opacity:1}
+.no3d #gl{display:none}
+.no3d .gl-wrap{background:var(--canvas) url(assets/img/volt-studio.jpg) 78% 50%/min(62vw,1100px) auto no-repeat}
+.overlay{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:2;pointer-events:none}
+.overlay svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.callout{fill:none;stroke:var(--glow);stroke-width:1;stroke-opacity:.75;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .7s var(--ease)}
+.callout.on{stroke-dashoffset:0}
+.tag{position:absolute;left:0;top:0;display:flex;align-items:center;gap:10px;opacity:0;will-change:transform,opacity}
+.tag i{width:9px;height:9px;border-radius:50%;background:var(--canvas);border:1.5px solid var(--glow);box-shadow:0 0 0 4px rgba(107,155,255,.12);transform:translate(-50%,0);transition:transform .4s var(--ease),background .4s var(--ease)}
+.tag span{display:none;font:500 13px/1 var(--body);color:var(--text);background:rgba(11,15,24,.7);border:1px solid var(--glass-edge);padding:7px 11px;border-radius:999px;white-space:nowrap;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.tag.flip{flex-direction:row-reverse}
+.tag.flip i{transform:translate(50%,0)}
+.tag.is-active i{background:var(--glow);transform:translate(-50%,0) scale(1.3);box-shadow:0 0 0 6px rgba(107,155,255,.16),0 0 20px rgba(107,155,255,.65)}
+
+/* ---------- navegação ---------- */
+.nav{position:fixed;inset:0 0 auto 0;height:var(--nav-h);z-index:20;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 var(--gutter)}
+.nav::before{content:"";position:absolute;inset:0 0 -24px 0;z-index:-1;background:linear-gradient(180deg,rgba(4,6,12,.92),rgba(4,6,12,.6) 60%,rgba(4,6,12,0));opacity:0;transition:opacity .5s var(--ease);pointer-events:none}
+.nav.scrolled::before{opacity:1}
+.brand{display:flex;align-items:center;gap:10px;padding:8px 0;text-decoration:none;font:600 18px/1 var(--display);letter-spacing:.2em}
+.brand svg{width:26px;height:26px}
+.nav__links{display:flex;gap:clamp(18px,2.6vw,36px)}
+.nav__links a{padding:10px 0;font-size:15px;font-weight:500;color:var(--text-2);text-decoration:none;transition:color .3s var(--ease)}
+.nav__links a:hover{color:var(--text)}
+.nav__end{display:flex;align-items:center;gap:16px}
+.lang{display:flex;align-items:center;gap:0;font:500 13px/1 var(--body);letter-spacing:.08em}
+.lang button{min-width:32px;height:36px;padding:0 6px;color:var(--text-3);opacity:.75;transition:color .3s var(--ease),opacity .3s var(--ease)}
+.lang button + button::before{content:"";display:inline-block;width:1px;height:11px;background:var(--line-2);vertical-align:-1px;margin-right:12px}
+.lang button:hover{color:var(--text);opacity:1}
+.lang button[aria-pressed="true"]{color:var(--text);opacity:1}
+
+/* ---------- botões ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:52px;padding:0 26px;border-radius:999px;font:600 16px/1 var(--body);text-decoration:none;transition:background .35s var(--ease),border-color .35s var(--ease),color .35s var(--ease),transform .35s var(--ease)}
+.btn--primary{background:var(--accent);color:#fff;box-shadow:0 10px 30px -12px rgba(40,100,240,.8)}
+.btn--primary:hover{background:var(--accent-hover);transform:translateY(-1px)}
+.btn svg{width:16px;height:16px;transition:transform .35s var(--ease)}
+.btn:hover svg{transform:translateX(3px)}
+@media (pointer:coarse){.btn{min-height:48px}.lang button{min-width:44px;height:44px}.foot nav a{padding:14px 2px}}
+
+/* ---------- tipografia ---------- */
+/* marca dos títulos: traço fino que termina num índice, como os marcadores do mostrador */
+.kicker{display:inline-flex;align-items:center;gap:12px;font:600 13px/1.3 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--text-2)}
+.kicker::before{content:"";flex:none;width:34px;height:11px;
+  background:linear-gradient(90deg,rgba(107,155,255,0),rgba(107,155,255,.9)) left 50%/100% 1px no-repeat,
+             linear-gradient(var(--glow),var(--glow)) right 50%/1.5px 11px no-repeat;
+  filter:drop-shadow(0 0 4px rgba(107,155,255,.55))}
+.center .kicker::after{content:"";flex:none;width:34px;height:11px;
+  background:linear-gradient(270deg,rgba(107,155,255,0),rgba(107,155,255,.9)) left 50%/100% 1px no-repeat,
+             linear-gradient(var(--glow),var(--glow)) left 50%/1.5px 11px no-repeat;
+  filter:drop-shadow(0 0 4px rgba(107,155,255,.55))}
+h1,h2,h3{font-family:var(--display);font-weight:600;letter-spacing:-.03em;line-height:1.04;text-wrap:balance}
+h2{font-size:clamp(34px,4.4vw,64px)}
+h3{font-weight:500;letter-spacing:-.02em;line-height:1.16}
+.lede{font-size:clamp(17px,1.35vw,20px);line-height:1.6;color:var(--text-2)}
+.eyebrow{font:600 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--glow)}
+
+main{position:relative;z-index:3}
+section{position:relative}
+.sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+
+/* ---------- 1 hero ---------- */
+.hero{min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:calc(var(--nav-h) + 24px) var(--gutter) 120px;overflow:hidden;background:var(--canvas);isolation:isolate}
+.hero__media{position:absolute;inset:0;z-index:-1}
+.hero__media img{width:100%;height:100%;object-fit:cover;object-position:62% 50%;transform:scale(1.04);animation:heroIn 2.2s var(--ease) forwards}
+.hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(90deg,var(--canvas) 0%,rgba(4,6,12,.7) 30%,rgba(4,6,12,0) 58%),linear-gradient(0deg,var(--canvas) 0%,rgba(4,6,12,0) 28%)}
+.hero > *:not(.hero__media){position:relative;z-index:1}
+@keyframes heroIn{from{opacity:0;transform:scale(1.09)}to{opacity:1;transform:scale(1.04)}}
+.hero__inner{max-width:640px}
+.hero h1{font-size:clamp(48px,6.6vw,104px);letter-spacing:-.045em;line-height:.98;margin:0 0 26px}
+.hero .lede{max-width:30ch}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:38px}
+.hero .rise{opacity:0;transform:translateY(22px);animation:rise 1.1s var(--ease) forwards}
+.hero .rise:nth-child(2){animation-delay:.12s}.hero .rise:nth-child(3){animation-delay:.24s}
+@keyframes rise{to{opacity:1;transform:none}}
+.hero > .scroll-cue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:12px;font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+.scroll-cue i{position:relative;width:1px;height:46px;background:var(--line);overflow:hidden}
+.scroll-cue i::after{content:"";position:absolute;left:0;top:0;width:1px;height:18px;background:var(--glow);animation:cue 2.6s var(--ease-io) infinite;animation-delay:-.8s}
+@keyframes cue{0%{transform:translateY(-18px)}70%,100%{transform:translateY(46px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- 2 transição ---------- */
+.intro{height:210vh}
+.intro .sticky{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:calc(var(--nav-h) + 6vh) var(--gutter) 0}
+.intro h2{font-size:clamp(36px,5.2vw,78px);max-width:14ch;margin-top:20px}
+.intro h2 .w{display:inline-block;will-change:transform,opacity}
+.intro__sub{margin-top:18px;color:var(--text-2);font-size:clamp(16px,1.3vw,19px)}
+
+/* ---------- 3/4 desmontagem: card de vidro por camada + coluna de peças ---------- */
+.explode{height:calc(100vh + 6 * 95vh)}
+.explode .sticky{display:grid;grid-template-columns:minmax(340px,32vw) 1fr minmax(230px,19vw);align-items:center;gap:20px;padding:var(--nav-h) var(--gutter) 0}
+.explode__panel{align-self:center;min-width:0;padding:30px 32px 26px}
+.explode__head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:18px;margin-bottom:22px;border-bottom:1px solid var(--line)}
+.steps{display:grid}
+.step{grid-area:1/1;opacity:0;transform:translateY(14px);filter:blur(4px);transition:opacity .55s var(--ease),transform .55s var(--ease),filter .55s var(--ease);pointer-events:none}
+.step.is-active{opacity:1;transform:none;filter:none;pointer-events:auto}
+.step h3{font-size:clamp(26px,2.2vw,34px);margin:14px 0 14px;max-width:17ch}
+.step > p{color:var(--text-2);max-width:42ch;font-size:16.5px}
+.stat{display:flex;align-items:baseline;gap:14px;margin-top:22px;padding:16px 18px;border-radius:16px;background:rgba(4,6,12,.4);border:1px solid var(--line)}
+.stat b{font:600 clamp(26px,2.2vw,34px)/1 var(--display);letter-spacing:-.03em;white-space:nowrap;background:linear-gradient(180deg,#fff,#b9cbff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{font-size:14px;line-height:1.4;color:var(--text-2)}
+.gauge{grid-column:3;list-style:none;display:flex;flex-direction:column;gap:2px;justify-self:end;width:100%;padding:10px}
+.gauge button{width:100%;display:grid;grid-template-columns:20px 1fr;align-items:center;column-gap:12px;text-align:left;padding:12px 12px;border-radius:14px;border:1px solid transparent;transition:background .4s var(--ease),border-color .4s var(--ease)}
+.gauge .g-ic{width:20px;height:20px;fill:none;stroke:var(--text-3);stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .4s var(--ease),filter .4s var(--ease)}
+.gauge .g-name{font-size:15px;font-weight:500;color:var(--text-2);transition:color .4s var(--ease)}
+.gauge .g-sub{grid-column:2;font-size:13px;color:var(--text-3);max-height:0;opacity:0;overflow:hidden;transition:max-height .5s var(--ease),opacity .5s var(--ease),margin .5s var(--ease)}
+.gauge button:hover .g-name{color:var(--text)}
+.gauge li.is-active button{background:rgba(255,255,255,.05);border-color:var(--glass-edge)}
+.gauge li.is-active .g-ic{stroke:var(--glow);filter:drop-shadow(0 0 5px rgba(107,155,255,.6))}
+.gauge li.is-active .g-name{color:var(--text)}
+.gauge li.is-active .g-sub{max-height:24px;opacity:1;margin-top:4px}
+
+/* ---------- 5 materiais ---------- */
+.materials{height:calc(100vh + 4 * 90vh)}
+.materials .sticky{padding:calc(var(--nav-h) + 4vh) var(--gutter) 6vh;display:flex;flex-direction:column;justify-content:space-between}
+.mat__head{transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.head-off .mat__head{opacity:0!important;transform:translateY(-12px)!important}
+.mat__head h2{font-size:clamp(28px,3vw,44px);max-width:18ch;margin-top:16px}
+.mat__stack{display:grid;max-width:460px}
+.mat{grid-area:1/1;padding:26px 28px;opacity:0;transform:translateY(18px);transition:opacity .55s var(--ease),transform .55s var(--ease)}
+.mat.is-active{opacity:1;transform:none}
+.mat h3{font-size:clamp(22px,1.8vw,28px);margin:12px 0 12px}
+.mat p{color:var(--text-2);font-size:16px}
+
+/* ---------- 6 reconstrução ---------- */
+.rebuild{height:230vh}
+.rebuild .sticky{display:flex;flex-direction:column;align-items:center;text-align:center;padding:calc(var(--nav-h) + 7vh) var(--gutter) 0}
+.rebuild h2{font-size:clamp(34px,4.6vw,70px);max-width:18ch}
+.rebuild h2 span{display:block}
+.rebuild h2 .l2{color:var(--text-2)}
+.rebuild h2 .l1,.rebuild h2 .l2{will-change:transform,opacity}
+
+/* ---------- 7 detalhes: um item aberto por vez ---------- */
+.details{height:180vh}
+.details .sticky{display:grid;grid-template-columns:minmax(330px,34vw) 1fr;align-items:center;padding:var(--nav-h) var(--gutter) 0}
+.details__col{min-width:0}
+.details__col h2{font-size:clamp(30px,3.2vw,48px);max-width:15ch;margin:16px 0 26px}
+.feats{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.feat{border-radius:26px;transition:background .45s var(--ease),border-color .45s var(--ease),box-shadow .45s var(--ease),width .45s var(--ease);max-width:440px}
+.feat:not(.open){background:rgba(14,19,30,.55);border-color:rgba(255,255,255,.06);box-shadow:none}
+.feat__btn{display:flex;align-items:center;gap:14px;width:100%;padding:13px 22px 13px 14px;text-align:left;font-size:16.5px;font-weight:600;color:var(--text)}
+.feat__ic{position:relative;flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(243,246,252,.8);transition:transform .45s var(--ease),background .45s var(--ease),border-color .45s var(--ease)}
+.feat__ic::before,.feat__ic::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:1.5px;background:var(--text);border-radius:2px;transform:translate(-50%,-50%)}
+.feat__ic::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .45s var(--ease)}
+.feat.open .feat__ic{background:var(--accent);border-color:var(--accent);transform:rotate(180deg)}
+.feat.open .feat__ic::after{transform:translate(-50%,-50%) rotate(0deg)}
+.feat__body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ease)}
+.feat.open .feat__body{grid-template-rows:1fr}
+.feat__inner{overflow:hidden}
+.feat__inner > div{padding:0 22px 20px 54px;opacity:0;transform:translateY(-6px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
+.feat.open .feat__inner > div{opacity:1;transform:none;transition-delay:.12s}
+.feat__inner p{color:var(--text-2);font-size:15.5px;max-width:38ch}
+.swatches{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.swatch{display:flex;align-items:center;gap:9px;padding:6px 14px 6px 6px;border-radius:999px;border:1px solid var(--line);font-size:14px;color:var(--text-2);transition:border-color .3s var(--ease),color .3s var(--ease)}
+.swatch i{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.35),inset 0 -2px 4px rgba(0,0,0,.4)}
+.swatch[aria-pressed="true"]{border-color:var(--glow);color:var(--text)}
+.chiprow{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.chiprow span{font-size:13px;font-weight:600;color:var(--text);padding:6px 12px;border-radius:999px;background:rgba(107,155,255,.12);border:1px solid rgba(107,155,255,.28)}
+
+/* ---------- 8 experiência (relógio à esquerda, texto à direita) ---------- */
+.experience{height:170vh}
+.experience .sticky{display:grid;grid-template-columns:1fr minmax(340px,38vw);align-items:center;padding:var(--nav-h) var(--gutter) 0}
+.exp__copy{grid-column:2;min-width:0;padding:32px}
+.exp__copy h2{font-size:clamp(30px,3.2vw,48px);max-width:14ch;margin:16px 0 16px}
+.exp__copy .lede{max-width:40ch;font-size:17px}
+.crown-ui{display:flex;align-items:center;gap:24px;margin-top:28px}
+.dial{position:relative;flex:none;width:120px;height:120px;border-radius:50%;touch-action:none;cursor:grab;
+  background:radial-gradient(circle at 38% 32%,#3a414d 0%,#1d222b 55%,#0e1218 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 18px 40px -18px rgba(0,0,0,.8),0 0 0 6px rgba(11,15,24,.9),0 0 0 7px var(--line)}
+.dial:active{cursor:grabbing}
+.dial__knurl{position:absolute;inset:0;border-radius:50%;will-change:transform}
+.dial__knurl svg{width:100%;height:100%}
+.dial__ring{position:absolute;inset:22%;border-radius:50%;border:2px solid var(--accent);box-shadow:0 0 16px rgba(40,100,240,.55),inset 0 0 12px rgba(40,100,240,.35);transition:box-shadow .3s var(--ease)}
+.dial.tick .dial__ring{box-shadow:0 0 28px rgba(107,155,255,.9),inset 0 0 16px rgba(107,155,255,.6)}
+.dial__hint{position:absolute;left:50%;bottom:-30px;transform:translateX(-50%);white-space:nowrap;font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
+.modes{display:grid;grid-template-columns:repeat(2,auto);gap:8px}
+.modes button{height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);font-size:15px;font-weight:500;color:var(--text-2);transition:color .35s var(--ease),border-color .35s var(--ease),background .35s var(--ease)}
+.modes button:hover{color:var(--text);border-color:var(--line-2)}
+.modes button[aria-selected="true"]{color:#fff;background:rgba(40,100,240,.18);border-color:var(--accent)}
+.mode-copy{display:grid;margin-top:44px;padding-top:22px;border-top:1px solid var(--line)}
+.mc{grid-area:1/1;opacity:0;transform:translateY(10px);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+.mc.is-active{opacity:1;transform:none}
+.mc h3{font-size:clamp(20px,1.6vw,24px);margin:10px 0 8px}
+.mc p{color:var(--text-2);font-size:15.5px}
+
+/* ---------- 9 especificações sobre o chip ---------- */
+.specs{padding:clamp(120px,20vh,200px) var(--gutter) clamp(110px,16vh,170px);text-align:center}
+.specs::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,6,12,0),rgba(4,6,12,.45) 16%,rgba(4,6,12,.55) 40%,rgba(4,6,12,.82) 62%,rgba(4,6,12,.82) 90%,rgba(4,6,12,0))}
+.specs > *{position:relative}
+.specs__head{max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+.specs__head h2{font-size:clamp(38px,4.8vw,72px);letter-spacing:-.04em;margin:20px 0 20px}
+.specs__head p{color:var(--text-2);max-width:52ch}
+.stats{max-width:1080px;margin:clamp(56px,9vh,96px) auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.stats div{display:flex;flex-direction:column;align-items:center;gap:6px;text-shadow:0 2px 22px rgba(4,7,13,.95),0 0 2px rgba(4,7,13,.6)}
+.stats small{font-size:14px;color:var(--text-3)}
+.stats b{font:600 clamp(34px,3.6vw,54px)/1.05 var(--display);letter-spacing:-.035em;color:var(--text)}
+.stats span{font-size:14px;color:var(--text-2);max-width:24ch}
+.bento{max-width:1080px;margin:clamp(56px,9vh,96px) auto 0;display:grid;grid-template-columns:1fr 1fr;gap:14px;text-align:left}
+.bcard{padding:28px 30px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.bcard.wide{grid-column:1/-1;display:grid;grid-template-columns:1fr auto;gap:12px 48px;align-items:center}
+.bcard .ico{width:30px;height:30px;color:var(--glow);fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.bcard h3{font-size:clamp(21px,1.7vw,26px);letter-spacing:-.02em}
+.bcard p{color:var(--text-2);font-size:15.5px;max-width:52ch}
+.bcard .big{display:flex;flex-direction:column;gap:4px;padding-left:40px;border-left:1px solid var(--line)}
+.bcard .big small{font-size:13px;color:var(--text-3)}
+.bcard .big b{font:600 clamp(32px,3vw,44px)/1 var(--display);letter-spacing:-.035em}
+.bcard .big span{font-size:13.5px;color:var(--text-2);max-width:24ch}
+.feats-grid{max-width:1180px;margin:clamp(72px,11vh,120px) auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(48px,7vh,72px) clamp(28px,3.4vw,52px)}
+.fcol{display:flex;flex-direction:column;align-items:center;text-align:center;text-shadow:0 2px 18px rgba(4,6,12,.95),0 0 3px rgba(4,6,12,.8)}
+.fi{width:46px;height:46px;fill:none;stroke:var(--text);stroke-width:1.15;stroke-linecap:round;stroke-linejoin:round;margin-bottom:22px}
+.fcol h3{font-size:clamp(19px,1.5vw,22px);letter-spacing:-.015em;line-height:1.25;max-width:16ch;min-height:2.5em;display:flex;align-items:flex-end;justify-content:center}
+.fcol p{margin-top:22px;padding-top:22px;border-top:1px solid var(--line-2);width:100%;color:var(--text-2);font-size:16px;line-height:1.6}
+.feats-grid .reveal:nth-child(3n+2).in{transition-delay:.1s}.feats-grid .reveal:nth-child(3n).in{transition-delay:.2s}
+.specs__note{max-width:70ch;margin:28px auto 0;font-size:14px;color:var(--text-3)}
+.specs .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.specs .reveal.in{opacity:1;transform:none}
+.stats .reveal:nth-child(2).in,.bento .reveal:nth-child(2).in{transition-delay:.1s}
+.stats .reveal:nth-child(3).in,.bento .reveal:nth-child(3).in{transition-delay:.2s}
+
+/* ---------- 9b outros modelos ---------- */
+.family{position:relative;z-index:1;background:#020204;padding:clamp(110px,16vh,170px) var(--gutter) clamp(90px,12vh,130px);display:flex;flex-direction:column;align-items:center;text-align:center}
+.family h2{font-size:clamp(40px,5.6vw,84px);letter-spacing:-.045em;margin:18px 0 0;max-width:14ch}
+.family__media{width:min(1500px,100vw);margin:calc(-1 * clamp(0px,3vw,48px)) calc(-1 * var(--gutter)) 0}
+.family__media img{width:100%;height:auto;-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent 98%);mask-image:linear-gradient(180deg,#000 72%,transparent 98%)}
+.models{width:100%;max-width:1100px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(24px,3vw,48px);margin-top:8px}
+.model{display:flex;flex-direction:column;align-items:center}
+.model .dot{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.35),inset 0 -2px 4px rgba(0,0,0,.45)}
+.model h3{font-size:clamp(20px,1.6vw,24px);margin:16px 0 10px;letter-spacing:-.02em}
+.model h3 span{color:var(--text-3);font-weight:500}
+.model p{color:var(--text-2);font-size:15.5px;max-width:30ch}
+.family__note{margin-top:44px;font-size:13.5px;color:var(--text-3)}
+.family .reveal{opacity:0;transform:translateY(22px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.family .reveal.in{opacity:1;transform:none}
+.models .reveal:nth-child(2).in{transition-delay:.1s}.models .reveal:nth-child(3).in{transition-delay:.2s}
+
+/* ---------- 10 encerramento ---------- */
+.closing{position:relative;background:var(--canvas);overflow:hidden;isolation:isolate;display:flex;flex-direction:column;align-items:center;text-align:center}
+.closing__copy{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;padding:clamp(100px,15vh,150px) var(--gutter) 0}
+.closing h2{font-size:clamp(40px,6vw,92px);letter-spacing:-.045em;margin:20px 0 30px;max-width:13ch}
+.closing__media{display:block;width:100%;margin-top:calc(-1 * clamp(80px,22vw,400px))}
+.closing__media img{width:100%;height:auto;-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 26%,#000 82%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0%,#000 26%,#000 82%,transparent 100%)}
+
+/* ---------- rodapé ---------- */
+.foot{position:relative;z-index:3;background:var(--canvas);padding:64px var(--gutter) 44px;display:grid;grid-template-columns:1fr auto;gap:30px 40px;align-items:start}
+.foot nav{display:flex;flex-wrap:wrap;gap:22px}
+.foot nav a{padding:10px 0;color:var(--text-2);text-decoration:none;font-size:15px;transition:color .3s var(--ease)}
+.foot nav a:hover{color:var(--text)}
+.foot__note{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px 40px;padding-top:8px;font-size:14px;color:var(--text-3)}
+.foot__note p{max-width:70ch}
+
+/* ---------- telas médias e celular ---------- */
+@media (max-width:1100px){
+  .bento{grid-template-columns:1fr}
+  .bcard.wide{grid-template-columns:1fr}
+  .bcard .big{padding:16px 0 0;border-left:0;border-top:1px solid var(--line)}
+}
+@media (max-width:900px){
+  .nav__links{display:none}
+  .explode .sticky{grid-template-columns:1fr}
+  .gauge{display:none}
+  .stats{grid-template-columns:1fr;gap:34px}
+  .feats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:720px), (orientation:portrait) and (max-width:1024px){
+  :root{--nav-h:60px}
+  body{font-size:16px}
+  .nav   .hero{align-items:flex-end;padding-bottom:110px}
+  .hero::before{background:linear-gradient(180deg,rgba(4,6,12,0) 30%,rgba(4,6,12,.85) 58%,var(--canvas) 78%)}
+  .hero__media img{object-position:50% 0}
+  .hero__inner{position:relative}
+  .hero h1{font-size:clamp(42px,11vw,66px);margin:0 0 16px}
+  .cta-row{margin-top:26px}
+  .cta-row .btn{flex:1 1 auto}
+  .hero > .scroll-cue{display:none}
+    .no3d .gl-wrap{background-position:50% 18%;background-size:120vw auto}
+  .intro{height:190vh}
+  .intro .sticky{padding-top:calc(var(--nav-h) + 3vh)}
+  .explode{height:calc(100vh + 6 * 80vh)}
+  .explode .sticky{align-items:end;padding:0 12px 12px}
+  .explode__panel{align-self:end;padding:20px 20px 16px}
+  .explode__head{display:none}
+  .step h3{font-size:22px;margin:10px 0 8px}
+  .step > p{font-size:15px}
+  .stat{margin-top:14px;padding:12px 14px}
+  .stat b{font-size:22px}
+  .stat span{font-size:13px}
+  .tag.is-active span{display:inline-block}
+  .materials{height:calc(100vh + 4 * 76vh)}
+  .materials .sticky{padding:calc(var(--nav-h) + 2vh) 12px 12px}
+  .mat__head h2{font-size:26px}
+  .mat{padding:20px}
+  .rebuild{height:210vh}
+  .details,.experience{height:auto}
+  .details .sticky,.experience .sticky{position:relative;height:auto;min-height:100svh;grid-template-columns:1fr;align-items:end;padding:58svh 14px 48px}
+  .exp__copy{grid-column:1;padding:22px}
+  .feat{max-width:none;width:100%}
+  .details__col{padding-top:44px;background:linear-gradient(180deg,rgba(6,6,8,0),rgba(6,6,8,.94) 90px)}
+  .crown-ui{gap:18px}
+  .dial{width:100px;height:100px}
+  .modes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .specs{padding-top:100px}
+  .feats-grid{grid-template-columns:1fr;gap:44px}
+  .models{grid-template-columns:1fr;gap:34px}
+  .family__media{width:150vw;margin-left:-25vw;margin-right:-25vw}
+  .fcol h3{min-height:0}
+  .closing__copy{padding-top:110px}
+  .closing__media{margin-top:-28vw}
+  .foot{grid-template-columns:1fr}
+}
+@media (max-width:420px){.kicker{letter-spacing:.1em;gap:8px}.kicker::before,.center .kicker::after{width:16px}}
+@media (max-height:620px) and (min-width:721px){
+  .hero > .scroll-cue{display:none}
+  .gauge button{padding:8px 12px}
+  .explode__panel{padding:20px 24px}
+}
+
+/* ---------- movimento reduzido: estados finais, nada desliza ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;transition-delay:0s!important}
+  .hero .rise,.specs .reveal,.family .reveal{opacity:1!important;transform:none!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Pular para o conteúdo</a>
+
+<div class="gl-wrap" id="glwrap" aria-hidden="true"><canvas id="gl" tabindex="-1"></canvas></div>
+<div class="overlay" id="overlay" aria-hidden="true">
+  <svg><path class="callout" id="callout" pathLength="1" d=""/></svg>
+</div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#topo" data-i18n-aria="brandAria" aria-label="VOLT, voltar ao início">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="#91A0BA" stroke-width="1.6"/><path d="M10.5 11l5.5 10 5.5-10" fill="none" stroke="#F3F6FC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="28" cy="16" r="2" fill="#2864F0"/></svg>
+    VOLT
+  </a>
+  <nav class="nav__links" data-i18n-aria="navAria" aria-label="Principal">
+    <a href="#detalhes" data-i18n="navExplore">Explorar</a>
+    <a href="#desmontagem" data-i18n="navEng">Engenharia</a>
+    <a href="#especificacoes" data-i18n="navSpecs">Especificações</a>
+  </nav>
+  <div class="nav__end">
+    <div class="lang" role="group" data-i18n-aria="langAria" aria-label="Idioma">
+      <button type="button" data-lang="pt" aria-pressed="true" lang="pt-BR">PT</button>
+      <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <!-- 1 · HERO -->
+  <section class="hero" id="topo" aria-labelledby="hero-title">
+    <picture class="hero__media" aria-hidden="true">
+      <source media="(max-width: 720px), (orientation: portrait) and (max-width: 1024px)" srcset="assets/img/hero-m.webp">
+      <img src="assets/img/hero.webp" alt="" width="2400" height="1350" fetchpriority="high" decoding="async">
+    </picture>
+    <div class="hero__inner">
+      <h1 id="hero-title" class="rise" data-i18n="heroTitle">Além do tempo.</h1>
+      <p class="lede rise" data-i18n="heroLede">Tecnologia projetada para acompanhar cada movimento. Engenharia de precisão em uma forma que você pode sentir.</p>
+      <div class="cta-row rise">
+        <a class="btn btn--primary" href="#engenharia"><span data-i18n="heroCta1">Conheça o VOLT One</span>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true"><span data-i18n="cue">Role para explorar</span><i></i></div>
+  </section>
+
+  <!-- 2 · TRANSIÇÃO -->
+  <section class="intro center" id="engenharia" aria-labelledby="intro-title">
+    <div class="sticky">
+      <p class="kicker" data-i18n="introKicker">Por baixo do vidro</p>
+      <h2 id="intro-title"><span class="sr-only" data-i18n="introTitle">Cada detalhe tem uma razão.</span><span aria-hidden="true" data-split="introTitle">Cada detalhe tem uma razão.</span></h2>
+      <p class="intro__sub" data-intro-sub data-i18n="introSub">Antes de mostrar o que ele faz, vamos abrir o relógio.</p>
+    </div>
+  </section>
+
+  <!-- 3 e 4 · DESMONTAGEM + COMPONENTES -->
+  <section class="explode" id="desmontagem" aria-labelledby="explode-title">
+    <div class="sticky">
+      <div class="explode__panel glass">
+        <div class="explode__head"><p class="kicker" id="explode-title" data-i18n="explodeKicker">Seis camadas, uma intenção</p></div>
+        <div class="steps">
+          <article class="step" data-step="0">
+            <p class="eyebrow" data-i18n="p1">Vidro de safira</p>
+            <h3 data-i18n="s1t">Precisão na superfície. Resistência em cada detalhe.</h3>
+            <p data-i18n="s1p">A primeira camada é a que você toca. O conceito usa safira, material escolhido na relojoaria por <strong>resistir bem a riscos</strong>, para manter a leitura limpa mesmo depois de muito uso.</p>
+            <div class="stat"><b>9</b><span data-i18n="s1s">na escala de Mohs, a dureza da safira</span></div>
+          </article>
+          <article class="step" data-step="1">
+            <p class="eyebrow" data-i18n="p2">Moldura de titânio</p>
+            <h3 data-i18n="s2t">Uma estrutura pensada para proteger o que importa.</h3>
+            <p data-i18n="s2p">A moldura prende o vidro e desenha o contorno do relógio. Titânio entra no projeto pela relação entre <strong>leveza e rigidez</strong>, com um acabamento que não disputa atenção com a tela.</p>
+            <div class="stat"><b data-i18n="s2v">Grau 5</b><span data-i18n="s2s">titânio proposto para caixa e moldura</span></div>
+          </article>
+          <article class="step" data-step="2">
+            <p class="eyebrow" data-i18n="p3">Tela AMOLED</p>
+            <h3 data-i18n="s3t">Luz só onde precisa.</h3>
+            <p data-i18n="s3p">Logo abaixo do vidro fica o módulo de tela circular. Em uma tela AMOLED cada pixel acende sozinho, então <strong>o preto é preto de verdade</strong> e a interface gasta energia só com o que aparece.</p>
+            <div class="stat"><b>466 × 466</b><span data-i18n="s3s">pixels em 1,43 polegada, na proposta</span></div>
+          </article>
+          <article class="step" data-step="3">
+            <p class="eyebrow" data-i18n="p4">Placa principal</p>
+            <h3 data-i18n="s4t">Tudo o que decide, em pouco espaço.</h3>
+            <p data-i18n="s4p">Processador, memória e conexões dividem uma placa compacta. Concentrar os componentes <strong>libera volume para a bateria</strong> logo abaixo.</p>
+            <div class="stat"><b data-i18n="s4v">4 rádios</b><span data-i18n="s4s">Bluetooth, Wi-Fi, NFC e GPS na mesma placa</span></div>
+          </article>
+          <article class="step" data-step="4">
+            <p class="eyebrow" data-i18n="p5">Sensores ópticos</p>
+            <h3 data-i18n="s5t">Informação captada com precisão, apresentada no momento certo.</h3>
+            <p data-i18n="s5p">Na tampa traseira, LEDs e fotodiodos ficam encostados no pulso e <strong>leem variações de luz na pele</strong>. O relógio transforma essa leitura em dados de movimento e atividade. É um conceito de bem-estar, não um dispositivo médico.</p>
+            <div class="stat"><b>4 + 4</b><span data-i18n="s5s">LEDs e fotodiodos sob uma janela de safira</span></div>
+          </article>
+          <article class="step" data-step="5">
+            <p class="eyebrow" data-i18n="p6">Bateria</p>
+            <h3 data-i18n="s6t">Cada camada contribui para uma experiência mais integrada.</h3>
+            <p data-i18n="s6p">A bateria ocupa o maior volume interno. Tela, processador e sensores foram pensados para <strong>consumir pouco juntos</strong>, em vez de depender só de uma bateria maior.</p>
+            <div class="stat"><b data-i18n="s6v">Até 3 dias</b><span data-i18n="s6s">meta de autonomia, ainda sem teste</span></div>
+          </article>
+        </div>
+      </div>
+      <ol class="gauge glass" id="gauge" data-i18n-aria="gaugeAria" aria-label="Ir para uma camada">
+        <li><button type="button" data-go="0"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l4 5-9 11L3 9z"/><path d="M3 9h18"/></svg><span class="g-name" data-i18n="g1">Vidro de safira</span><span class="g-sub" data-i18n="g1s">Proteção e nitidez</span></button></li>
+        <li><button type="button" data-go="1"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5.5"/></svg><span class="g-name" data-i18n="g2">Moldura de titânio</span><span class="g-sub" data-i18n="g2s">Leveza e rigidez</span></button></li>
+        <li><button type="button" data-go="2"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span class="g-name" data-i18n="g3">Tela AMOLED</span><span class="g-sub" data-i18n="g3s">Contraste e economia</span></button></li>
+        <li><button type="button" data-go="3"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></svg><span class="g-name" data-i18n="g4">Placa principal</span><span class="g-sub" data-i18n="g4s">Processamento</span></button></li>
+        <li><button type="button" data-go="4"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-5 3.5 10 2.5-6.5 1.5 1.5H21"/></svg><span class="g-name" data-i18n="g5">Sensores</span><span class="g-sub" data-i18n="g5s">Leitura óptica no pulso</span></button></li>
+        <li><button type="button" data-go="5"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7.5" width="16" height="9" rx="2.5"/><path d="M21.5 10.5v3M7 10.5v3M10 10.5v3"/></svg><span class="g-name" data-i18n="g6">Bateria</span><span class="g-sub" data-i18n="g6s">Energia</span></button></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 5 · MATERIAIS -->
+  <section class="materials" id="materiais" aria-labelledby="mat-title">
+    <div class="sticky">
+      <div class="mat__head">
+        <p class="kicker" data-i18n="matKicker">Feito para o toque</p>
+        <h2 id="mat-title" data-i18n="matTitle">Escolhas de engenharia que dá para ver de perto.</h2>
+      </div>
+      <div class="mat__stack">
+        <article class="mat glass" data-m="0"><p class="eyebrow" data-i18n="m1i">Vidro</p><h3 data-i18n="m1t">Safira com borda chanfrada</h3>
+          <p data-i18n="m1p">A borda levemente inclinada <strong>quebra o reflexo na lateral</strong> e deixa o vidro rente à moldura. A luz rasante passa pela superfície sem distorcer o mostrador.</p></article>
+        <article class="mat glass" data-m="1"><p class="eyebrow" data-i18n="m2i">Lateral</p><h3 data-i18n="m2t">Titânio escovado</h3>
+          <p data-i18n="m2p">O acabamento escovado <strong>disfarça marcas pequenas do dia a dia</strong> e segura a luz em linhas finas, em vez de espelhar tudo em volta.</p></article>
+        <article class="mat glass" data-m="2"><p class="eyebrow" data-i18n="m3i">Coroa</p><h3 data-i18n="m3t">Serrilhado com anel azul</h3>
+          <p data-i18n="m3p">O serrilhado dá aderência ao toque e o anel azul é <strong>o único ponto de cor da caixa</strong>. É pela coroa que você navega pela interface.</p></article>
+        <article class="mat glass" data-m="3"><p class="eyebrow" data-i18n="m4i">Traseira</p><h3 data-i18n="m4t">Cerâmica com janela de safira</h3>
+          <p data-i18n="m4p">A cerâmica fica confortável na pele e <strong>não bloqueia sinais sem fio</strong>. Sobre os sensores, uma janela de safira protege a leitura óptica.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · RECONSTRUÇÃO -->
+  <section class="rebuild" id="reconstrucao" aria-labelledby="rebuild-title">
+    <div class="sticky">
+      <h2 id="rebuild-title"><span class="l1" data-i18n="r1">Complexidade por dentro.</span> <span class="l2" data-i18n="r2">Clareza em cada interação.</span></h2>
+    </div>
+  </section>
+
+  <!-- 7 · DETALHES -->
+  <section class="details" id="detalhes" aria-labelledby="det-title">
+    <div class="sticky">
+      <div class="details__col">
+        <p class="kicker" data-i18n="detKicker">Detalhes que contam</p>
+        <h2 id="det-title" data-i18n="detTitle">Feito de pequenas decisões.</h2>
+        <div class="feats" id="feats">
+          <div class="feat glass open" data-focus="finish">
+            <button class="feat__btn" type="button" aria-expanded="true" aria-controls="fd-1" id="fb-1"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f1">Acabamentos</span></button>
+            <div class="feat__body" id="fd-1" role="region" aria-labelledby="fb-1"><div class="feat__inner"><div>
+              <p data-i18n="f1p">Três acabamentos para a mesma caixa. <strong>A cor muda, a construção continua idêntica.</strong></p>
+              <div class="swatches" role="group" data-i18n-aria="swAria" aria-label="Escolha o acabamento">
+                <button class="swatch" type="button" data-finish="0" aria-pressed="true"><i style="background:radial-gradient(circle at 35% 30%,#9aa1ac,#3b4049 70%)"></i><span data-i18n="sw0">Titânio escuro</span></button>
+                <button class="swatch" type="button" data-finish="1" aria-pressed="false"><i style="background:radial-gradient(circle at 35% 30%,#e3e5e9,#8b9098 70%)"></i><span data-i18n="sw1">Titânio natural</span></button>
+                <button class="swatch" type="button" data-finish="2" aria-pressed="false"><i style="background:radial-gradient(circle at 35% 30%,#6f86c8,#1f2a4a 70%)"></i><span data-i18n="sw2">Azul meia-noite</span></button>
+              </div>
+            </div></div></div>
+          </div>
+          <div class="feat glass" data-focus="size">
+            <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-2" id="fb-2"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f2">Dois tamanhos</span></button>
+            <div class="feat__body" id="fd-2" role="region" aria-labelledby="fb-2"><div class="feat__inner"><div>
+              <p data-i18n="f2p">A mesma tela circular e a mesma espessura em duas caixas. <strong>As alças mudam de proporção</strong> para acompanhar pulsos menores.</p>
+              <div class="chiprow"><span>40 mm</span><span>44 mm</span></div>
+            </div></div></div>
+          </div>
+          <div class="feat glass" data-focus="crown">
+            <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-3" id="fb-3"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f3">Coroa giratória</span></button>
+            <div class="feat__body" id="fd-3" role="region" aria-labelledby="fb-3"><div class="feat__inner"><div>
+              <p data-i18n="f3p">Gire para rolar listas e trocar de modo <strong>sem cobrir a tela com o dedo</strong>. O serrilhado fino segura bem mesmo com a mão suada.</p>
+            </div></div></div>
+          </div>
+          <div class="feat glass" data-focus="button">
+            <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-4" id="fb-4"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f4">Botão lateral</span></button>
+            <div class="feat__body" id="fd-4" role="region" aria-labelledby="fb-4"><div class="feat__inner"><div>
+              <p data-i18n="f4p">Logo abaixo da coroa, <strong>um botão que você configura</strong>: iniciar um treino, abrir a carteira ou acender a lanterna.</p>
+            </div></div></div>
+          </div>
+          <div class="feat glass" data-focus="durable">
+            <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-5" id="fb-5"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f5">Resistência</span></button>
+            <div class="feat__body" id="fd-5" role="region" aria-labelledby="fb-5"><div class="feat__inner"><div>
+              <p data-i18n="f5p">Safira na frente, cerâmica atrás e titânio no meio. <strong>A meta de projeto inclui chuva, piscina e suor</strong> do dia a dia.</p>
+            </div></div></div>
+          </div>
+          <div class="feat glass" data-focus="charge">
+            <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-6" id="fb-6"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f6">Carregamento sem fio</span></button>
+            <div class="feat__body" id="fd-6" role="region" aria-labelledby="fb-6"><div class="feat__inner"><div>
+              <p data-i18n="f6p">Uma bobina na tampa traseira recarrega o relógio na base magnética. <strong>Sem conectores expostos</strong> para juntar sujeira.</p>
+            </div></div></div>
+          </div>
+          <div class="feat glass" data-focus="strap">
+            <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-7" id="fb-7"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f7">Pulseira</span></button>
+            <div class="feat__body" id="fd-7" role="region" aria-labelledby="fb-7"><div class="feat__inner"><div>
+              <p data-i18n="f7p">Fluoroelastômero macio, com canais que <strong>deixam o pulso respirar</strong>, e um fecho de titânio que quase não pesa.</p>
+            </div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · EXPERIÊNCIA -->
+  <section class="experience" id="experiencia" aria-labelledby="exp-title">
+    <div class="sticky">
+      <div class="exp__copy glass">
+        <p class="kicker" data-i18n="expKicker">Do pulso para o seu dia</p>
+        <h2 id="exp-title" data-i18n="expTitle">Um gesto muda o que a tela mostra.</h2>
+        <p class="lede" data-i18n="expLede">Gire a coroa para ver o VOLT One em quatro momentos do dia. Interface conceitual, com valores ilustrativos.</p>
+        <div class="crown-ui">
+          <div class="dial" id="dial" role="slider" tabindex="0" data-i18n-aria="dialAria" aria-label="Coroa do relógio. Gire para trocar o modo da tela" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-valuetext="Dia">
+            <div class="dial__knurl" id="dialKnurl"><svg viewBox="0 0 100 100" aria-hidden="true" id="dialSvg"></svg></div>
+            <div class="dial__ring"></div>
+            <span class="dial__hint" aria-hidden="true" data-i18n="dialHint">Gire</span>
+          </div>
+          <div class="modes" role="tablist" data-i18n-aria="modesAria" aria-label="Modos da tela">
+            <button type="button" role="tab" aria-selected="true" data-mode="0" data-i18n="mode0">Dia</button>
+            <button type="button" role="tab" aria-selected="false" data-mode="1" data-i18n="mode1">Treino</button>
+            <button type="button" role="tab" aria-selected="false" data-mode="2" data-i18n="mode2">Foco</button>
+            <button type="button" role="tab" aria-selected="false" data-mode="3" data-i18n="mode3">Noite</button>
+          </div>
+        </div>
+        <div class="mode-copy" aria-live="polite">
+          <div class="mc is-active" data-mc="0"><p class="eyebrow" data-i18n="mc0c">No dia a dia</p><h3 data-i18n="mc0t">Seu dia, uma volta de cada vez.</h3><p data-i18n="mc0p">Próximo compromisso, passos e mensagens importantes aparecem quando fazem sentido. O resto espera.</p></div>
+          <div class="mc" data-mc="1"><p class="eyebrow" data-i18n="mc1c">Na prática esportiva</p><h3 data-i18n="mc1t">Ritmo e distância sem tirar o olho do caminho.</h3><p data-i18n="mc1p">Durante o treino, os números ficam grandes e legíveis em movimento. Um giro na coroa troca de tela sem parar a corrida.</p></div>
+          <div class="mc" data-mc="2"><p class="eyebrow" data-i18n="mc2c">No trabalho</p><h3 data-i18n="mc2t">Menos avisos. Mais atenção.</h3><p data-i18n="mc2p">O modo foco segura as notificações que podem esperar e deixa só um cronômetro na tela.</p></div>
+          <div class="mc" data-mc="3"><p class="eyebrow" data-i18n="mc3c">À noite</p><h3 data-i18n="mc3t">Brilho baixo para não acender o quarto.</h3><p data-i18n="mc3p">A tela escurece e mostra só a hora e o próximo alarme, com o mínimo de luz.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 · ESPECIFICAÇÕES -->
+  <section class="specs center" id="especificacoes" aria-labelledby="specs-title">
+    <div class="specs__head">
+      <p class="kicker" data-i18n="specKicker">O conceito em números</p>
+      <h2 id="specs-title" data-i18n="specTitle">Pensado por dentro, medido para o seu dia.</h2>
+      <p data-i18n="specLede">O VOLT One é um conceito. Os valores abaixo são metas de design coerentes entre si, não medições de um produto fabricado.</p>
+    </div>
+
+    <div class="stats">
+      <div class="reveal"><small data-i18n="st1l">Meta de autonomia</small><b data-i18n="st1v">Até 3 dias</b><span data-i18n="st1s">em uso típico, ainda sem teste</span></div>
+      <div class="reveal"><small data-i18n="st2l">Caixa em titânio</small><b>44 mm</b><span data-i18n="st2s">com 11,2 mm de espessura</span></div>
+      <div class="reveal"><small data-i18n="st3l">Tela AMOLED</small><b>466 × 466</b><span data-i18n="st3s">pixels em 1,43 polegada</span></div>
+    </div>
+
+    <div class="bento">
+      <article class="bcard glass wide reveal">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.2 2.5 5.6 13.4c-.3.5 0 1.1.6 1.1H11l-1.4 7c-.1.6.6.9 1 .4l7.8-11c.3-.5 0-1.1-.6-1.1H13l1.2-6.8c.1-.6-.6-.9-1-.5Z"/></svg>
+          <h3 data-i18n="b1t">Energia que acompanha o seu ritmo.</h3>
+          <p data-i18n="b1p">Tela, processador e sensores foram desenhados para gastar pouco juntos. A meta é <strong>até 3 dias de uso típico</strong> com uma carga, e a recarga acontece <strong>sem fio, na base magnética</strong>.</p>
+        </div>
+        <div class="big"><small data-i18n="b1l">Perfis de energia</small><b data-i18n="b1v">4 modos</b><span data-i18n="b1s">um para cada momento da tela: dia, treino, foco e noite</span></div>
+      </article>
+      <article class="bcard glass reveal">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8c-.3 0-.5.1-.7.4C9.6 5.6 5.5 11 5.5 14.5a6.5 6.5 0 0 0 13 0c0-3.5-4.1-8.9-5.8-11.3-.2-.3-.4-.4-.7-.4Z" /><path d="M9 15.2a3 3 0 0 0 3 2.8"/></svg>
+        <h3 data-i18n="b2t">Feito para o dia inteiro.</h3>
+        <p data-i18n="b2p"><strong>Safira</strong> na frente, <strong>cerâmica</strong> atrás e titânio no meio. A meta de projeto inclui chuva, piscina e suor.</p>
+      </article>
+      <article class="bcard glass reveal">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12h4l2-5 3.5 10 2.5-6.5 1.5 1.5h5.5"/></svg>
+        <h3 data-i18n="b3t">Leitura óptica no pulso.</h3>
+        <p data-i18n="b3p">Quatro LEDs e quatro fotodiodos medem variações de luz na pele. <strong>Conceito de bem-estar</strong>, sem fins médicos.</p>
+      </article>
+    </div>
+
+    <div class="feats-grid">
+      <article class="fcol reveal"><svg class="fi" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="11"/><path d="M24 17v7l4.5 3"/></svg><h3 data-i18n="sp1t">Tela AMOLED</h3><p data-i18n="sp1p">AMOLED circular de 1,43 polegada, com 466 × 466 pixels sob um vidro de safira plano de borda chanfrada.</p></article>
+      <article class="fcol reveal"><svg class="fi" viewBox="0 0 48 48" aria-hidden="true"><path d="M15 9h18l9 12-18 19L6 21z"/><path d="M6 21h36M18 9l6 31 6-31"/></svg><h3 data-i18n="sp2t">Titânio, safira e cerâmica</h3><p data-i18n="sp2p">Caixa e moldura em titânio escovado, coroa serrilhada com anel azul anodizado e traseira em cerâmica com janela de safira.</p></article>
+      <article class="fcol reveal"><svg class="fi" viewBox="0 0 48 48" aria-hidden="true"><path d="M5 24h8l4-10 7 20 5-13 3 3h11"/></svg><h3 data-i18n="sp3t">Sensores de bem-estar</h3><p data-i18n="sp3p">LEDs verdes e azuis com fotodiodos, acelerômetro, giroscópio, barômetro e sensor de luz. Pensados para bem-estar e atividade, sem fins médicos.</p></article>
+      <article class="fcol reveal"><svg class="fi" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6 41 15 24 24 7 15z"/><path d="m7 24 17 9 17-9M7 33l17 9 17-9"/></svg><h3 data-i18n="sp4t">Seis camadas</h3><p data-i18n="sp4p">Caixa de 40 mm ou 44 mm com 11,2 mm de espessura. Vidro, moldura, tela, placa, sensores e bateria, empilhados nessa ordem.</p></article>
+      <article class="fcol reveal"><svg class="fi" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 19a20 20 0 0 1 28 0M15 25a12.5 12.5 0 0 1 18 0M20 31a5.5 5.5 0 0 1 8 0"/><circle cx="24" cy="37" r="1.6"/></svg><h3 data-i18n="sp5t">Conectividade completa</h3><p data-i18n="sp5p">Bluetooth LE, Wi-Fi, NFC para pagamentos e GPS de dupla frequência. Controle pela coroa giratória, pelo botão lateral e pelo toque.</p></article>
+      <article class="fcol reveal"><svg class="fi" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="16" width="30" height="16" rx="4"/><path d="M41 21.5v5"/><path d="m23.5 19.5-4 5h5l-4 5"/></svg><h3 data-i18n="sp6t">Até 3 dias de meta</h3><p data-i18n="sp6p">Bateria de íon de lítio com meta de até 3 dias em uso típico, ainda sem teste. Recarga sem fio na base magnética e um perfil de energia por modo.</p></article>
+    </div>
+    <p class="specs__note" data-i18n="specNote">Nenhum valor aqui foi medido. Tamanho, tela e autonomia são metas do conceito e servem para manter o projeto coerente entre as seções.</p>
+  </section>
+
+  <!-- 9b · OUTROS MODELOS -->
+  <section class="family center" id="modelos" aria-labelledby="fam-title">
+    <p class="kicker" data-i18n="famKicker">A família VOLT</p>
+    <h2 id="fam-title" data-i18n="famTitle">Um VOLT para cada pulso.</h2>
+    <div class="family__media"><img src="assets/img/family.webp" alt="Três versões do VOLT One lado a lado: titânio natural, titânio escuro e azul meia-noite" data-i18n-alt="famAlt" width="2400" height="1300" loading="lazy" decoding="async"></div>
+    <div class="models">
+      <article class="model reveal"><i class="dot" style="background:radial-gradient(circle at 35% 30%,#e3e5e9,#8b9098 70%)"></i><h3>VOLT One <span>40 mm</span></h3><p data-i18n="mod1">Titânio natural, para pulsos mais finos. A mesma construção em uma caixa menor.</p></article>
+      <article class="model reveal"><i class="dot" style="background:radial-gradient(circle at 35% 30%,#9aa1ac,#3b4049 70%)"></i><h3>VOLT One <span>44 mm</span></h3><p data-i18n="mod2">Titânio escuro, o modelo desta página. Tela maior e mais espaço para a bateria.</p></article>
+      <article class="model reveal"><i class="dot" style="background:radial-gradient(circle at 35% 30%,#6f86c8,#1f2a4a 70%)"></i><h3>VOLT One Edition <span>44 mm</span></h3><p data-i18n="mod3">Azul meia-noite anodizado, com pulseira no mesmo tom.</p></article>
+    </div>
+    <p class="family__note" data-i18n="famNote">Modelos conceituais, criados para este projeto.</p>
+  </section>
+
+  <!-- 10 · ENCERRAMENTO -->
+  <section class="closing center" id="encerramento" aria-labelledby="close-title">
+    <div class="closing__copy">
+      <p class="kicker" data-i18n="closeKicker">Pronto para o pulso</p>
+      <h2 id="close-title" data-i18n="closeTitle">O próximo movimento é seu.</h2>
+      <a class="btn btn--primary" href="#detalhes"><span data-i18n="closeCta">Explore o VOLT One</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+    <picture class="closing__media" aria-hidden="true">
+      <source media="(max-width: 720px), (orientation: portrait) and (max-width: 1024px)" srcset="assets/img/close-m.webp">
+      <img src="assets/img/close.webp" alt="" width="2400" height="1350" loading="lazy" decoding="async">
+    </picture>
+  </section>
+</main>
+
+<footer class="foot">
+  <a class="brand" href="#topo" data-i18n-aria="brandAria" aria-label="VOLT, voltar ao início">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="#91A0BA" stroke-width="1.6"/><path d="M10.5 11l5.5 10 5.5-10" fill="none" stroke="#F3F6FC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="28" cy="16" r="2" fill="#2864F0"/></svg>
+    VOLT
+  </a>
+  <nav data-i18n-aria="footAria" aria-label="Rodapé">
+    <a href="#detalhes" data-i18n="navExplore">Explorar</a>
+    <a href="#desmontagem" data-i18n="navEng">Engenharia</a>
+    <a href="#materiais" data-i18n="footMat">Materiais</a>
+    <a href="#especificacoes" data-i18n="navSpecs">Especificações</a>
+  </nav>
+  <div class="foot__note">
+    <p data-i18n="footNote">VOLT One é um produto fictício, criado como conceito para um projeto de portfólio. Marca, interface e especificações são propostas de design.</p>
+    <p>© <span id="year">2026</span> VOLT</p>
+  </div>
+</footer>
+
+<script src="assets/vendor/gsap.min.js" defer></script>
+<script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+<script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
