@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=9';
-import { EN, RUNTIME } from './i18n.js?v=9';
+import { drawFace } from './face.js?v=10';
+import { EN, RUNTIME } from './i18n.js?v=10';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -74,6 +74,7 @@ function applyLang(l, initial = false) {
   splitWords();
   if (three) { buildTags(); three.setBackText(R().back); }
   paintFaces();
+  if (window.__expShots) window.__expShots();
   if (!initial && three) {
     clearTimeout(langRebuild);
     langRebuild = setTimeout(() => { buildTextScrubs(); buildMaster(); }, 60);
@@ -198,6 +199,20 @@ new IntersectionObserver(es => es.forEach(en => {
 // a hora real no mostrador: redesenha a cada 30 s
 setInterval(() => { if (!document.hidden && faceMode !== 'treino') paintFaces(); }, 30000);
 
+/* ---------------- fotos da experiência: uma por modo, troca pela coroa ---------------- */
+const expImgs = $$('.exp__shot img'), expModeName = $('#expModeName');
+function expShots(m = crownMode) {
+  expImgs.forEach((im, k) => {
+    const src = `assets/img/exp/exp-${MODE_KEYS[k]}-${lang}.webp`;
+    if (!im.getAttribute('src') || !im.getAttribute('src').endsWith(src)) im.setAttribute('src', src);
+    im.classList.toggle('is-active', k === m);
+  });
+  if (expModeName) expModeName.textContent = R().modes[m];
+  $$('.exp__ticks i').forEach((t, k) => t.classList.toggle('on', k === m));
+}
+window.__expShots = () => expShots(crownMode);
+expShots(0);
+
 /* ---------------- coroa interativa ---------------- */
 const dial = $('#dial'), knurl = $('#dialKnurl'), dialSvg = $('#dialSvg');
 {
@@ -219,6 +234,7 @@ function setCrownMode(m, fromDrag = false) {
   modeCopy.forEach((c, k) => c.classList.toggle('is-active', k === m));
   dial.setAttribute('aria-valuenow', String(m));
   dial.setAttribute('aria-valuetext', R().modes[m]);
+  expShots(m);
   if (changed) {
     dial.classList.add('tick'); setTimeout(() => dial.classList.remove('tick'), 220);
     if (expVisible) { faceMode = MODE_KEYS[m]; flashScreen(); }
@@ -384,14 +400,14 @@ function buildMaster() {
   add(R.top + 0.94 * R.r, P.rEnd, 'power2.out');
   add(D.top - vh * 0.15, P.det, 'power2.inOut');
   add(D.top + D.r, P.det);
-  add(X.top - vh * 0.1, P.exp, 'power2.inOut');
+  // a experiência agora é uma foto renderizada: o 3D apaga ao sair dos detalhes
+  add(X.top - vh * 0.55, P.expHidden, 'power1.in');
   // troca de cena por um apagar e acender, sem a câmera atravessar o espaço
   // o relógio da experiência apaga antes da seção de recursos (fotos); o chip só acende nas especificações
   const F = L.feats;
   const a0 = F.top - vh * 0.75, a1 = F.top - vh * 0.3, a2 = Sp.top - vh * 0.1;
   const b0 = Math.max(a2 + 10, Sp.top + Sp.h - vh * 0.75), b1 = Math.max(b0 + 10, L.family.top - vh * 0.55);
-  add(a0, P.exp);
-  add(a1, P.expHidden, 'power1.in');
+  add(a1, P.expHidden);
   add(a1 + 1, P.chipAHidden);
   add(Math.max(a1 + 2, Sp.top - vh * 0.55), P.chipAHidden);
   add(a2, P.chipA, 'power1.out');
@@ -542,7 +558,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=9'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=10'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;

@@ -54,6 +54,7 @@ export const EN = {
   mc1c: 'Working out', mc1t: 'Pace and distance without taking your eyes off the road.', mc1p: 'During a workout, the numbers get big and readable on the move. One turn of the crown switches screens without breaking your stride.',
   mc2c: 'At work', mc2t: 'Fewer alerts. More attention.', mc2p: 'Focus mode holds back the notifications that can wait and leaves only a timer on screen.',
   mc3c: 'At night', mc3t: 'Low brightness so the room stays dark.', mc3p: 'The screen dims and shows only the time and your next alarm, with as little light as possible.',
+  expBarR: '44 mm · dark titanium', expAlt0: 'VOLT One seen from the front, showing the selected screen mode',
   featsKicker: 'In step with your day', featsTitle: 'Ready for whatever the day asks.',
   featsPause: 'Pause', featsPlay: 'Play', featsPrev: 'Previous', featsNext: 'Next',
   fc1g: 'Water resistance', fc1t: 'Rain, pool and sweat.', fc1p: 'Sealing designed to keep up with the whole day, from rain on the way to a swim workout. A design target, not yet tested.', fc1a: 'Water droplets on a brushed titanium surface',

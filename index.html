@@ -237,9 +237,17 @@ section{position:relative}
 .chiprow span{font-size:13px;font-weight:600;color:var(--text);padding:6px 12px;border-radius:999px;background:rgba(107,155,255,.12);border:1px solid rgba(107,155,255,.28)}
 
 /* ---------- 8 experiência (relógio à esquerda, texto à direita) ---------- */
-.experience{height:170vh}
-.experience .sticky{display:grid;grid-template-columns:1fr minmax(340px,38vw);align-items:center;padding:var(--nav-h) var(--gutter) 0}
-.exp__copy{grid-column:2;min-width:0;padding:34px 34px 26px}
+.experience{height:auto;background:#020204}
+.experience .sticky{position:relative;height:auto;overflow:visible;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,38vw);align-items:center;gap:clamp(40px,6vw,110px);padding:clamp(110px,15vh,160px) var(--gutter)}
+.exp__frame{width:min(100%,64vh);justify-self:center;margin:0;padding:18px 0;border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2)}
+.exp__bar{display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:12.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+.exp__bar:first-child{margin-bottom:18px}.exp__bar:last-child{margin-top:18px}
+#expModeName{color:var(--text)}
+.exp__ticks{display:flex;gap:6px}.exp__ticks i.on{background:var(--text)}.exp__ticks i{width:18px;height:2px;border-radius:2px;background:var(--line-2);transition:background .5s var(--ease)}
+.exp__shot{position:relative;aspect-ratio:5/6;border-radius:20px;overflow:hidden;background:#04060c}
+.exp__shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.015);transition:opacity .7s var(--ease),transform 1.2s var(--ease)}
+.exp__shot img.is-active{opacity:1;transform:none}
+.exp__copy{grid-column:2;min-width:0;padding:clamp(34px,3vw,48px) clamp(34px,3vw,48px) 30px}
 .exp__copy h2{font-size:clamp(30px,3.2vw,48px);max-width:14ch;margin:16px 0 16px}
 .exp__copy .lede{max-width:34ch;font-size:17px}
 .dial{position:relative;flex:none;width:120px;height:120px;border-radius:50%;touch-action:none;cursor:grab;
@@ -400,8 +408,10 @@ section{position:relative}
   .mat__head h2{font-size:26px}
   .mat{padding:20px}
   .rebuild{height:210vh}
-  .details,.experience{height:auto}
-  .details .sticky,.experience .sticky{position:relative;height:auto;min-height:100svh;grid-template-columns:1fr;align-items:end;padding:58svh 14px 48px}
+  .details{height:auto}
+  .details .sticky{position:relative;height:auto;min-height:100svh;grid-template-columns:1fr;align-items:end;padding:58svh 14px 48px}
+  .experience .sticky{grid-template-columns:1fr;gap:36px;padding:90px var(--gutter)}
+  .exp__frame{width:100%}
   .exp__copy{grid-column:1;padding:22px}
   .feat{max-width:none;width:100%}
   .details__col{padding-top:44px;background:linear-gradient(180deg,rgba(6,6,8,0),rgba(6,6,8,.94) 90px)}
@@ -634,6 +644,16 @@ section{position:relative}
   <!-- 8 · EXPERIÊNCIA -->
   <section class="experience" id="experiencia" aria-labelledby="exp-title">
     <div class="sticky">
+      <figure class="exp__frame">
+        <figcaption class="exp__bar"><span>VOLT One</span><span data-i18n="expBarR">44 mm · titânio escuro</span></figcaption>
+        <div class="exp__shot">
+          <img alt="VOLT One de frente, com a tela no modo escolhido" data-i18n-alt="expAlt0" width="1800" height="2160" decoding="async" loading="lazy">
+          <img alt="" width="1800" height="2160" decoding="async" loading="lazy">
+          <img alt="" width="1800" height="2160" decoding="async" loading="lazy">
+          <img alt="" width="1800" height="2160" decoding="async" loading="lazy">
+        </div>
+        <div class="exp__bar"><span id="expModeName">Dia</span><span class="exp__ticks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+      </figure>
       <div class="exp__copy glass">
         <p class="kicker" data-i18n="expKicker">Do pulso para o seu dia</p>
         <h2 id="exp-title" data-i18n="expTitle">Um gesto muda o que a tela mostra.</h2>
@@ -793,6 +813,6 @@ section{position:relative}
 
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-<script type="module" src="assets/js/app.js?v=9"></script>
+<script type="module" src="assets/js/app.js?v=10"></script>
 </body>
 </html>
