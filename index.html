@@ -161,6 +161,7 @@ section{position:relative}
 .stat span{font-size:14px;line-height:1.4;color:var(--text-2)}
 .gauge{--slot:118px;grid-column:3;list-style:none;position:relative;justify-self:end;width:100%;height:calc(var(--slot) * 3.4);margin:0;padding:0;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 26%,#000 74%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 26%,#000 74%,transparent 100%)}
 .gauge li{position:absolute;left:0;right:0;top:50%;transform:translateY(calc(-50% + var(--d,0) * var(--slot))) scale(var(--s,.8));transform-origin:left center;opacity:var(--o,0);transition:transform .8s var(--ease),opacity .8s var(--ease)}
+.gauge li.is-active:not([style]){--o:1;--s:1}
 .gauge li.is-off{pointer-events:none;visibility:hidden;transition:transform .8s var(--ease),opacity .8s var(--ease),visibility 0s .8s}
 .gauge button{width:100%;display:grid;grid-template-columns:40px 1fr;align-items:center;column-gap:18px;text-align:left;padding:10px 0;border:0;background:none}
 .gauge .g-ic{width:40px;height:40px;padding:8px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.02);fill:none;stroke:var(--text-2);stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .6s var(--ease),filter .6s var(--ease),border-color .6s var(--ease),background .6s var(--ease)}
@@ -700,6 +701,6 @@ section{position:relative}
 
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-<script type="module" src="assets/js/app.js"></script>
+<script type="module" src="assets/js/app.js?v=7"></script>
 </body>
 </html>
