@@ -123,13 +123,28 @@ $$('#gauge button').forEach(b => b.addEventListener('click', () => {
   glideTo(L.explode.top + i * L.stepLen + L.stepLen * 0.7);
 }));
 
+/* ---------------- roda de camadas: a ativa no centro, vizinhas esmaecidas ---------------- */
+function setWheel(i) {
+  const c = Math.max(i, 0);
+  gaugeItems.forEach((g, k) => {
+    const d = k - c, a = Math.abs(d);
+    g.style.setProperty('--d', d);
+    g.style.setProperty('--s', a === 0 ? 1 : 0.8);
+    g.style.setProperty('--o', a === 0 ? 1 : a === 1 ? 0.42 : 0);
+    g.classList.toggle('is-active', d === 0);
+    g.classList.toggle('is-off', a > 1);
+    g.querySelector('button').tabIndex = a > 1 ? -1 : 0;
+  });
+}
+setWheel(0);
+
 /* ---------------- estado ativo das etapas ---------------- */
 let activeStep = -2, activeMat = -2;
 function setStep(i) {
   if (i === activeStep) return;
   activeStep = i;
   steps.forEach((s, k) => s.classList.toggle('is-active', k === i));
-  gaugeItems.forEach((g, k) => g.classList.toggle('is-active', k === i));
+  setWheel(i);
   callout.classList.remove('on');
   if (i >= 0) requestAnimationFrame(() => requestAnimationFrame(() => callout.classList.add('on')));
 }

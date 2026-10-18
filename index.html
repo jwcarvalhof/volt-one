@@ -148,7 +148,7 @@ section{position:relative}
 
 /* ---------- 3/4 desmontagem: card de vidro por camada + coluna de peças ---------- */
 .explode{height:calc(100vh + 6 * 95vh)}
-.explode .sticky{display:grid;grid-template-columns:minmax(340px,32vw) 1fr minmax(230px,19vw);align-items:center;gap:20px;padding:var(--nav-h) var(--gutter) 0}
+.explode .sticky{display:grid;grid-template-columns:minmax(340px,32vw) 1fr minmax(260px,20vw);align-items:center;gap:20px;padding:var(--nav-h) var(--gutter) 0}
 .explode__panel{align-self:center;min-width:0;padding:30px 32px 26px}
 .explode__head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:18px;margin-bottom:22px;border-bottom:1px solid var(--line)}
 .steps{display:grid}
@@ -159,16 +159,17 @@ section{position:relative}
 .stat{display:flex;align-items:baseline;gap:14px;margin-top:22px;padding:16px 18px;border-radius:16px;background:rgba(4,6,12,.4);border:1px solid var(--line)}
 .stat b{font:600 clamp(26px,2.2vw,34px)/1 var(--display);letter-spacing:-.03em;white-space:nowrap;background:linear-gradient(180deg,#fff,#b9cbff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .stat span{font-size:14px;line-height:1.4;color:var(--text-2)}
-.gauge{grid-column:3;list-style:none;display:flex;flex-direction:column;gap:2px;justify-self:end;width:100%;padding:10px}
-.gauge button{width:100%;display:grid;grid-template-columns:20px 1fr;align-items:center;column-gap:12px;text-align:left;padding:12px 12px;border-radius:14px;border:1px solid transparent;transition:background .4s var(--ease),border-color .4s var(--ease)}
-.gauge .g-ic{width:20px;height:20px;fill:none;stroke:var(--text-3);stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .4s var(--ease),filter .4s var(--ease)}
-.gauge .g-name{font-size:15px;font-weight:500;color:var(--text-2);transition:color .4s var(--ease)}
-.gauge .g-sub{grid-column:2;font-size:13px;color:var(--text-3);max-height:0;opacity:0;overflow:hidden;transition:max-height .5s var(--ease),opacity .5s var(--ease),margin .5s var(--ease)}
+.gauge{--slot:118px;grid-column:3;list-style:none;position:relative;justify-self:end;width:100%;height:calc(var(--slot) * 3.4);margin:0;padding:0;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 26%,#000 74%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 26%,#000 74%,transparent 100%)}
+.gauge li{position:absolute;left:0;right:0;top:50%;transform:translateY(calc(-50% + var(--d,0) * var(--slot))) scale(var(--s,.8));transform-origin:left center;opacity:var(--o,0);transition:transform .8s var(--ease),opacity .8s var(--ease)}
+.gauge li.is-off{pointer-events:none;visibility:hidden;transition:transform .8s var(--ease),opacity .8s var(--ease),visibility 0s .8s}
+.gauge button{width:100%;display:grid;grid-template-columns:40px 1fr;align-items:center;column-gap:18px;text-align:left;padding:10px 0;border:0;background:none}
+.gauge .g-ic{width:40px;height:40px;padding:8px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.02);fill:none;stroke:var(--text-2);stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .6s var(--ease),filter .6s var(--ease),border-color .6s var(--ease),background .6s var(--ease)}
+.gauge .g-name{font:600 clamp(20px,1.55vw,25px)/1.1 var(--display);letter-spacing:-.025em;color:var(--text-2);transition:color .6s var(--ease)}
+.gauge .g-sub{grid-column:2;font-size:15px;color:var(--text-3);margin-top:8px;opacity:0;transition:opacity .6s var(--ease)}
 .gauge button:hover .g-name{color:var(--text)}
-.gauge li.is-active button{background:rgba(255,255,255,.05);border-color:var(--glass-edge)}
-.gauge li.is-active .g-ic{stroke:var(--glow);filter:drop-shadow(0 0 5px rgba(107,155,255,.6))}
+.gauge li.is-active .g-ic{stroke:var(--glow);border-color:rgba(107,155,255,.35);background:rgba(40,100,240,.1);filter:drop-shadow(0 0 6px rgba(107,155,255,.45))}
 .gauge li.is-active .g-name{color:var(--text)}
-.gauge li.is-active .g-sub{max-height:24px;opacity:1;margin-top:4px}
+.gauge li.is-active .g-sub{opacity:1}
 
 /* ---------- 5 materiais ---------- */
 .materials{height:calc(100vh + 4 * 90vh)}
@@ -369,7 +370,7 @@ section{position:relative}
 @media (max-width:420px){.kicker{letter-spacing:.1em;gap:8px}.kicker::before,.center .kicker::after{width:16px}}
 @media (max-height:620px) and (min-width:721px){
   .hero > .scroll-cue{display:none}
-  .gauge button{padding:8px 12px}
+  .gauge{--slot:92px}
   .explode__panel{padding:20px 24px}
 }
 
@@ -478,7 +479,7 @@ section{position:relative}
           </article>
         </div>
       </div>
-      <ol class="gauge glass" id="gauge" data-i18n-aria="gaugeAria" aria-label="Ir para uma camada">
+      <ol class="gauge" id="gauge" data-i18n-aria="gaugeAria" aria-label="Ir para uma camada">
         <li><button type="button" data-go="0"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l4 5-9 11L3 9z"/><path d="M3 9h18"/></svg><span class="g-name" data-i18n="g1">Vidro de safira</span><span class="g-sub" data-i18n="g1s">Proteção e nitidez</span></button></li>
         <li><button type="button" data-go="1"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5.5"/></svg><span class="g-name" data-i18n="g2">Moldura de titânio</span><span class="g-sub" data-i18n="g2s">Leveza e rigidez</span></button></li>
         <li><button type="button" data-go="2"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span class="g-name" data-i18n="g3">Tela AMOLED</span><span class="g-sub" data-i18n="g3s">Contraste e economia</span></button></li>
