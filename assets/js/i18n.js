@@ -47,7 +47,7 @@ export const EN = {
   f6: 'Wireless charging', f6p: 'A coil in the caseback recharges the watch on its magnetic dock. <strong>No exposed contacts</strong> to collect dirt.',
   f7: 'Strap', f7p: 'Soft fluoroelastomer with channels that <strong>let your wrist breathe</strong>, and a titanium buckle that barely weighs a thing.',
   expKicker: 'From wrist to your day', expTitle: 'One gesture changes what the screen shows.',
-  expLede: 'Turn the crown to see VOLT One at four moments of the day. Concept interface with illustrative values.',
+  expLede: 'Turn the crown and see VOLT One at four moments of the day.', expNote: 'Concept interface with illustrative values.',
   dialAria: 'Watch crown. Turn to change the screen mode', dialHint: 'Turn', modesAria: 'Screen modes',
   mode0: 'Day', mode1: 'Workout', mode2: 'Focus', mode3: 'Night',
   mc0c: 'Day to day', mc0t: 'Your day, one turn at a time.', mc0p: 'Next meeting, steps and important messages show up when they make sense. Everything else waits.',
