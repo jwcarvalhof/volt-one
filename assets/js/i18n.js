@@ -5,7 +5,7 @@ export const EN = {
   brandAria: 'VOLT, back to top', navAria: 'Main', langAria: 'Language', footAria: 'Footer',
   navExplore: 'Explore', navEng: 'Engineering', navSpecs: 'Specs', footMat: 'Materials',
   heroTitle: 'Beyond time.',
-  heroLede: 'Technology designed to keep up with every move. Precision engineering in a form you can feel.',
+  heroLede: 'Made to keep up with every move, with precision you can feel.',
   heroCta1: 'Meet VOLT One', 
   cue: 'Scroll to explore',
   introKicker: 'Beneath the glass', introTitle: 'Every detail has a reason.', introSub: 'Before showing what it does, let’s open the watch.',
