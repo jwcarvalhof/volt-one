@@ -163,12 +163,12 @@ section{position:relative}
 .gauge li{position:absolute;left:0;right:0;top:50%;transform:translateY(calc(-50% + var(--d,0) * var(--slot))) scale(var(--s,.8));transform-origin:left center;opacity:var(--o,0);transition:transform .8s var(--ease),opacity .8s var(--ease)}
 .gauge li.is-active:not([style]){--o:1;--s:1}
 .gauge li.is-off{pointer-events:none;visibility:hidden;transition:transform .8s var(--ease),opacity .8s var(--ease),visibility 0s .8s}
-.gauge button{width:100%;display:grid;grid-template-columns:40px 1fr;align-items:center;column-gap:18px;text-align:left;padding:10px 0;border:0;background:none}
-.gauge .g-ic{width:40px;height:40px;padding:8px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.02);fill:none;stroke:var(--text-2);stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .6s var(--ease),filter .6s var(--ease),border-color .6s var(--ease),background .6s var(--ease)}
+.gauge button{width:100%;display:grid;grid-template-columns:42px 1fr;align-items:center;column-gap:18px;text-align:left;padding:10px 0;border:0;background:none}
+.gauge .g-ic{width:42px;height:42px;fill:none;stroke:var(--text-2);stroke-width:1.15;stroke-linecap:round;stroke-linejoin:round;transition:stroke .6s var(--ease)}
 .gauge .g-name{font:600 clamp(20px,1.55vw,25px)/1.1 var(--display);letter-spacing:-.025em;color:var(--text-2);transition:color .6s var(--ease)}
 .gauge .g-sub{grid-column:2;font-size:15px;color:var(--text-3);margin-top:8px;opacity:0;transition:opacity .6s var(--ease)}
 .gauge button:hover .g-name{color:var(--text)}
-.gauge li.is-active .g-ic{stroke:var(--glow);border-color:rgba(107,155,255,.35);background:rgba(40,100,240,.1);filter:drop-shadow(0 0 6px rgba(107,155,255,.45))}
+.gauge li.is-active .g-ic{stroke:var(--text)}
 .gauge li.is-active .g-name{color:var(--text)}
 .gauge li.is-active .g-sub{opacity:1}
 
@@ -481,12 +481,12 @@ section{position:relative}
         </div>
       </div>
       <ol class="gauge" id="gauge" data-i18n-aria="gaugeAria" aria-label="Ir para uma camada">
-        <li><button type="button" data-go="0"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l4 5-9 11L3 9z"/><path d="M3 9h18"/></svg><span class="g-name" data-i18n="g1">Vidro de safira</span><span class="g-sub" data-i18n="g1s">Proteção e nitidez</span></button></li>
-        <li><button type="button" data-go="1"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5.5"/></svg><span class="g-name" data-i18n="g2">Moldura de titânio</span><span class="g-sub" data-i18n="g2s">Leveza e rigidez</span></button></li>
-        <li><button type="button" data-go="2"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span class="g-name" data-i18n="g3">Tela AMOLED</span><span class="g-sub" data-i18n="g3s">Contraste e economia</span></button></li>
-        <li><button type="button" data-go="3"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></svg><span class="g-name" data-i18n="g4">Placa principal</span><span class="g-sub" data-i18n="g4s">Processamento</span></button></li>
-        <li><button type="button" data-go="4"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-5 3.5 10 2.5-6.5 1.5 1.5H21"/></svg><span class="g-name" data-i18n="g5">Sensores</span><span class="g-sub" data-i18n="g5s">Leitura óptica no pulso</span></button></li>
-        <li><button type="button" data-go="5"><svg class="g-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7.5" width="16" height="9" rx="2.5"/><path d="M21.5 10.5v3M7 10.5v3M10 10.5v3"/></svg><span class="g-name" data-i18n="g6">Bateria</span><span class="g-sub" data-i18n="g6s">Energia</span></button></li>
+        <li><button type="button" data-go="0"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15"/><path d="M16.5 21.5a8.5 8.5 0 0 1 5-5"/><path d="m20 31 11-11M25.5 32.5l7-7"/></svg><span class="g-name" data-i18n="g1">Vidro de safira</span><span class="g-sub" data-i18n="g1s">Proteção e nitidez</span></button></li>
+        <li><button type="button" data-go="1"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="11"/><path d="M24 9v4M24 35v4M9 24h4M35 24h4"/></svg><span class="g-name" data-i18n="g2">Moldura de titânio</span><span class="g-sub" data-i18n="g2s">Leveza e rigidez</span></button></li>
+        <li><button type="button" data-go="2"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="11"/><path d="M24 17v7l4.5 3"/></svg><span class="g-name" data-i18n="g3">Tela AMOLED</span><span class="g-sub" data-i18n="g3s">Contraste e economia</span></button></li>
+        <li><button type="button" data-go="3"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="15" y="15" width="18" height="18" rx="2.5"/><rect x="20" y="20" width="8" height="8" rx="1"/><path d="M20 10v5M28 10v5M20 33v5M28 33v5M10 20h5M10 28h5M33 20h5M33 28h5"/></svg><span class="g-name" data-i18n="g4">Placa principal</span><span class="g-sub" data-i18n="g4s">Processamento</span></button></li>
+        <li><button type="button" data-go="4"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><path d="M5 24h8l4-10 7 20 5-13 3 3h11"/></svg><span class="g-name" data-i18n="g5">Sensores</span><span class="g-sub" data-i18n="g5s">Leitura óptica no pulso</span></button></li>
+        <li><button type="button" data-go="5"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="16" width="30" height="16" rx="4"/><path d="M41 21.5v5"/><path d="m23.5 19.5-4 5h5l-4 5"/></svg><span class="g-name" data-i18n="g6">Bateria</span><span class="g-sub" data-i18n="g6s">Energia</span></button></li>
       </ol>
     </div>
   </section>
