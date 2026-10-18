@@ -36,7 +36,7 @@
   --line:rgba(145,160,186,.14); --line-2:rgba(145,160,186,.38);
   --glass:rgba(11,15,24,.42); --glass-edge:rgba(255,255,255,.09);
   --ease:cubic-bezier(.22,.61,.36,1); --ease-io:cubic-bezier(.65,0,.35,1);
-  --gutter:clamp(20px,5vw,72px); --nav-h:68px;
+  --gutter:clamp(24px,7vw,128px); --nav-h:68px;
   --display:Sora,Inter,system-ui,sans-serif; --body:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -119,9 +119,8 @@ main{position:relative;z-index:3}
 section{position:relative}
 .sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
 
-/* divisória entre seções de tom diferente */
-#engenharia,#detalhes,#experiencia,#especificacoes,#modelos,#encerramento,.foot{position:relative}
-#engenharia::before,#detalhes::before,#experiencia::before,#especificacoes::before,#modelos::before,#encerramento::before,.foot::before{content:"";position:absolute;z-index:5;top:0;left:var(--gutter);right:var(--gutter);height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(145,160,186,.28) 18%,rgba(145,160,186,.28) 82%,transparent)}
+/* divisória entre seções de tom diferente (borda com degradê: não usa pseudo-elementos nem muda o posicionamento) */
+#engenharia,#detalhes,#experiencia,#recursos,#especificacoes,#modelos,#encerramento,.foot{border-top:1px solid transparent;border-image:linear-gradient(90deg,transparent 3%,rgba(145,160,186,.28) 20%,rgba(145,160,186,.28) 80%,transparent 97%) 1}
 /* ---------- 1 hero ---------- */
 .hero{min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:calc(var(--nav-h) + 24px) var(--gutter) 120px;overflow:hidden;background:var(--canvas);isolation:isolate}
 .hero__media{position:absolute;inset:0;z-index:-1}
@@ -265,6 +264,34 @@ section{position:relative}
 .mc p{color:var(--text-2);font-size:15.5px;line-height:1.55}
 .exp__note{padding-top:16px;border-top:1px solid var(--line);font-size:13.5px;color:var(--text-3)}
 
+
+/* ---------- 8b recursos: carrossel ---------- */
+.rec{position:relative;z-index:2;background:#020204;padding:clamp(110px,15vh,160px) 0 clamp(90px,12vh,130px);overflow:hidden}
+.rec__head{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;padding:0 var(--gutter);margin-bottom:clamp(48px,7vh,80px)}
+.rec h2{font-size:clamp(34px,4.2vw,64px);letter-spacing:-.04em;max-width:15ch;margin:18px 0 0}
+.rec__ctrl{display:flex;gap:10px;flex:none}
+.fbtn{width:48px;height:48px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;color:var(--text);transition:background .3s var(--ease),border-color .3s var(--ease)}
+.fbtn:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.3)}
+.fbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.fbtn .ic-play{display:none}.fbtn.paused .ic-play{display:block;fill:currentColor;stroke:none}.fbtn.paused .ic-pause{display:none}
+.rec__track{display:flex;gap:clamp(18px,2vw,28px);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--gutter);padding:0 var(--gutter);scrollbar-width:none;overscroll-behavior-x:contain}
+.rec__track::-webkit-scrollbar{display:none}
+.rec__track::after{content:"";flex:0 0 calc(var(--gutter) - clamp(18px,2vw,28px))}
+.fcard{position:relative;flex:0 0 clamp(280px,29vw,440px);aspect-ratio:4/5;border-radius:24px;overflow:hidden;scroll-snap-align:start;background:#05070c;isolation:isolate}
+.fcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.02);transition:transform 1.2s var(--ease)}
+.fcard:hover img{transform:scale(1.06)}
+.fcard::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(2,2,4,0) 40%,rgba(2,2,4,.72) 70%,rgba(2,2,4,.94));pointer-events:none}
+.fcard__body{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:clamp(28px,2.8vw,44px)}
+.fcard__tag{display:inline-block;font-size:12.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--glow);margin-bottom:18px}
+.fcard h3{font-size:clamp(22px,1.8vw,28px);letter-spacing:-.025em;line-height:1.15;margin:0 0 16px}
+.fcard p:last-child{color:var(--text-2);font-size:15.5px;line-height:1.55;max-width:34ch}
+.rec__dots{display:flex;gap:8px;padding:0 var(--gutter);margin-top:clamp(28px,4vh,40px)}
+.rec__dots button{width:44px;height:28px;display:grid;align-items:center}
+.rec__dots i{display:block;height:2px;border-radius:2px;background:var(--line-2);overflow:hidden;position:relative}
+.rec__dots i::after{content:"";position:absolute;inset:0;background:var(--text);transform:scaleX(0);transform-origin:left}
+.rec__dots button.on i::after{transform:scaleX(1)}
+.rec.playing .rec__dots button.on i::after{animation:fdot var(--dur,5.5s) linear forwards}
+@keyframes fdot{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 /* ---------- 9 especificações sobre o chip ---------- */
 .specs{padding:clamp(120px,20vh,200px) var(--gutter) clamp(110px,16vh,170px);text-align:center}
 .specs::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,6,12,0),rgba(4,6,12,.45) 16%,rgba(4,6,12,.55) 40%,rgba(4,6,12,.82) 62%,rgba(4,6,12,.82) 90%,rgba(4,6,12,0))}
@@ -384,6 +411,8 @@ section{position:relative}
   .specs{padding-top:100px}
   .feats-grid{grid-template-columns:1fr;gap:44px}
   .models{grid-template-columns:1fr;gap:34px}
+  .rec__head{flex-direction:column;align-items:flex-start;gap:28px}
+  .fcard{flex-basis:82vw}
   .family__media{width:150vw;margin-left:-25vw;margin-right:-25vw}
   .fcol h3{min-height:0}
   .closing__copy{padding-top:110px}
@@ -633,6 +662,44 @@ section{position:relative}
     </div>
   </section>
 
+
+  <!-- 8b · RECURSOS: carrossel que passa sozinho ou pelos controles, sem depender da rolagem -->
+  <section class="rec" id="recursos" aria-labelledby="feats-title" aria-roledescription="carrossel">
+    <div class="rec__head">
+      <div>
+        <p class="kicker" data-i18n="featsKicker">No ritmo do seu dia</p>
+        <h2 id="feats-title" data-i18n="featsTitle">Pronto para tudo o que o dia pede.</h2>
+      </div>
+      <div class="rec__ctrl">
+        <button type="button" class="fbtn" id="featsPlay" data-i18n-aria="featsPause" aria-label="Pausar"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="ic-pause" d="M9 6v12M15 6v12"/><path class="ic-play" d="M8 5.5v13l11-6.5z"/></svg></button>
+        <button type="button" class="fbtn" id="featsPrev" data-i18n-aria="featsPrev" aria-label="Anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6"/></svg></button>
+        <button type="button" class="fbtn" id="featsNext" data-i18n-aria="featsNext" aria-label="Próximo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg></button>
+      </div>
+    </div>
+    <div class="rec__track" id="featsTrack">
+      <article class="fcard" aria-roledescription="slide" aria-label="1 / 5">
+        <img src="assets/img/feat/agua.webp" alt="Gotas de água sobre uma superfície de titânio escovado" data-i18n-alt="fc1a" width="928" height="1152" loading="lazy" decoding="async">
+        <div class="fcard__body"><p class="fcard__tag" data-i18n="fc1g">Resistência</p><h3 data-i18n="fc1t">Chuva, piscina e suor.</h3><p data-i18n="fc1p">Vedação pensada para acompanhar o dia inteiro, da chuva no caminho ao treino na piscina. Meta de projeto, ainda sem teste.</p></div>
+      </article>
+      <article class="fcard" aria-roledescription="slide" aria-label="2 / 5">
+        <img src="assets/img/feat/pulso.webp" alt="Antebraço de um atleta com suor, iluminado por uma luz azul" data-i18n-alt="fc2a" width="928" height="1152" loading="lazy" decoding="async">
+        <div class="fcard__body"><p class="fcard__tag" data-i18n="fc2g">Batimentos</p><h3 data-i18n="fc2t">O ritmo do coração, no pulso.</h3><p data-i18n="fc2p">Leitura óptica contínua ao longo do dia e nos treinos, para você entender o seu esforço. Bem-estar, sem fins médicos.</p></div>
+      </article>
+      <article class="fcard" aria-roledescription="slide" aria-label="3 / 5">
+        <img src="assets/img/feat/trilha.webp" alt="Corredor em uma trilha no alto da montanha, antes do nascer do sol" data-i18n-alt="fc3a" width="928" height="1152" loading="lazy" decoding="async">
+        <div class="fcard__body"><p class="fcard__tag" data-i18n="fc3g">GPS de dupla frequência</p><h3 data-i18n="fc3t">Rota, ritmo e distância, sem o celular.</h3><p data-i18n="fc3p">Registre a trilha inteira direto no relógio e veja o caminho percorrido quando voltar.</p></div>
+      </article>
+      <article class="fcard" aria-roledescription="slide" aria-label="4 / 5">
+        <img src="assets/img/feat/carga.webp" alt="Base de carga redonda com um anel de luz azul sobre uma pedra escura" data-i18n-alt="fc4a" width="928" height="1152" loading="lazy" decoding="async">
+        <div class="fcard__body"><p class="fcard__tag" data-i18n="fc4g">Carga sem fio</p><h3 data-i18n="fc4t">Encaixe e pronto.</h3><p data-i18n="fc4p">Base magnética, sem contatos expostos. Meta de até 3 dias de uso típico por carga.</p></div>
+      </article>
+      <article class="fcard" aria-roledescription="slide" aria-label="5 / 5">
+        <img src="assets/img/feat/noite.webp" alt="Quarto escuro à noite, com uma pessoa dormindo" data-i18n-alt="fc5a" width="928" height="1152" loading="lazy" decoding="async">
+        <div class="fcard__body"><p class="fcard__tag" data-i18n="fc5g">Modo noite</p><h3 data-i18n="fc5t">Pouca luz, quarto escuro.</h3><p data-i18n="fc5p">À noite a tela mostra só a hora e o próximo alarme, com o mínimo de luz possível.</p></div>
+      </article>
+    </div>
+    <div class="rec__dots" id="featsDots"><button type="button" data-i="0" aria-label="1"><i></i></button><button type="button" data-i="1" aria-label="2"><i></i></button><button type="button" data-i="2" aria-label="3"><i></i></button><button type="button" data-i="3" aria-label="4"><i></i></button><button type="button" data-i="4" aria-label="5"><i></i></button></div>
+  </section>
   <!-- 9 · ESPECIFICAÇÕES -->
   <section class="specs center" id="especificacoes" aria-labelledby="specs-title">
     <div class="specs__head">
@@ -726,6 +793,6 @@ section{position:relative}
 
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-<script type="module" src="assets/js/app.js?v=8"></script>
+<script type="module" src="assets/js/app.js?v=9"></script>
 </body>
 </html>

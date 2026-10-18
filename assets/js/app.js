@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=8';
-import { EN, RUNTIME } from './i18n.js?v=8';
+import { drawFace } from './face.js?v=9';
+import { EN, RUNTIME } from './i18n.js?v=9';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -40,7 +40,7 @@ let no3d = qs.has('no3d') || (!qs.has('force3d') && webglStatus() !== 'ok');
 const nav = $('#nav');
 const sec = {
   intro: $('#engenharia'), explode: $('#desmontagem'), mat: $('#materiais'),
-  rebuild: $('#reconstrucao'), det: $('#detalhes'), exp: $('#experiencia'), specs: $('#especificacoes'), family: $('#modelos'), close: $('#encerramento')
+  rebuild: $('#reconstrucao'), det: $('#detalhes'), exp: $('#experiencia'), feats: $('#recursos'), specs: $('#especificacoes'), family: $('#modelos'), close: $('#encerramento')
 };
 const steps = $$('.step'), gaugeItems = $$('#gauge li'), mats = $$('.mat');
 const callout = $('#callout');
@@ -52,6 +52,8 @@ const PT = {}, PT_ARIA = {};
 $$('[data-i18n]').forEach(el => { PT[el.dataset.i18n] = el.innerHTML.trim(); });
 $$('[data-i18n-aria]').forEach(el => { PT_ARIA[el.dataset.i18nAria] = el.getAttribute('aria-label'); });
 $$('[data-i18n-alt]').forEach(el => { PT[el.dataset.i18nAlt] = el.getAttribute('alt'); });
+PT_ARIA.featsPlay = 'Reproduzir';
+window.__voltT = k => (lang === 'en' ? EN[k] : PT_ARIA[k]) || PT_ARIA[k];
 let lang = (qs.get('lang') || store.get('volt-lang') || 'pt') === 'en' ? 'en' : 'pt';
 const R = () => RUNTIME[lang];
 const tx = k => (lang === 'en' ? EN[k] : PT[k]) ?? PT[k] ?? '';
@@ -384,11 +386,14 @@ function buildMaster() {
   add(D.top + D.r, P.det);
   add(X.top - vh * 0.1, P.exp, 'power2.inOut');
   // troca de cena por um apagar e acender, sem a câmera atravessar o espaço
-  const a0 = Sp.top - vh * 0.8, a1 = Sp.top - vh * 0.5, a2 = Sp.top - vh * 0.1;
+  // o relógio da experiência apaga antes da seção de recursos (fotos); o chip só acende nas especificações
+  const F = L.feats;
+  const a0 = F.top - vh * 0.75, a1 = F.top - vh * 0.3, a2 = Sp.top - vh * 0.1;
   const b0 = Math.max(a2 + 10, Sp.top + Sp.h - vh * 0.75), b1 = Math.max(b0 + 10, L.family.top - vh * 0.55);
   add(a0, P.exp);
   add(a1, P.expHidden, 'power1.in');
   add(a1 + 1, P.chipAHidden);
+  add(Math.max(a1 + 2, Sp.top - vh * 0.55), P.chipAHidden);
   add(a2, P.chipA, 'power1.out');
   add(b0, P.chipB, 'sine.inOut');
   add(b1, P.chipBHidden, 'power1.in');
@@ -537,7 +542,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=8'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=9'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
@@ -624,3 +629,57 @@ new IntersectionObserver(es => es.forEach(en => {
 applyLang(lang, true);
 if (no3d) goStatic();
 else (window.requestIdleCallback || (f => setTimeout(f, 60)))(() => init3D(), { timeout: 600 });
+
+/* ---------------- recursos: carrossel que passa sozinho ou pelos controles ----------------
+   A rolagem da página não troca os cards. Ele pausa com o mouse em cima, com foco,
+   ao tocar, fora da tela e quando o sistema pede menos movimento. */
+(function feats() {
+  const root = $('#recursos'); if (!root) return;
+  const track = $('#featsTrack'), cards = $$('.fcard', track), dots = $$('#featsDots button');
+  const btnPlay = $('#featsPlay'), DUR = 5500;
+  let idx = 0, timer = 0, userPaused = mqReduce.matches, hover = false, inView = false;
+  const cardX = i => cards[i].offsetLeft - track.firstElementChild.offsetLeft;
+  function mark(i) {
+    idx = i;
+    dots.forEach((d, k) => { d.classList.toggle('on', k === i); d.setAttribute('aria-current', k === i ? 'true' : 'false'); });
+    // reinicia a barra de progresso do ponto ativo
+    const bar = dots[i] && dots[i].querySelector('i'); if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
+  }
+  function go(i, smooth = true) {
+    const n = cards.length; i = (i + n) % n;
+    track.scrollTo({ left: cardX(i), behavior: smooth && !mqReduce.matches ? 'smooth' : 'auto' });
+    mark(i); schedule();
+  }
+  function playing() { return !userPaused && !hover && inView && !document.hidden; }
+  function schedule() {
+    clearTimeout(timer);
+    root.classList.toggle('playing', playing());
+    if (playing()) timer = setTimeout(() => go(idx + 1), DUR);
+  }
+  function setPaused(p) {
+    userPaused = p; btnPlay.classList.toggle('paused', p);
+    const k = p ? 'featsPlay' : 'featsPause'; btnPlay.dataset.i18nAria = k;
+    btnPlay.setAttribute('aria-label', (window.__voltT && window.__voltT(k)) || (p ? 'Reproduzir' : 'Pausar'));
+    schedule();
+  }
+  // o usuário arrastou: o card mais próximo vira o ativo
+  let st = 0;
+  track.addEventListener('scroll', () => { clearTimeout(st); st = setTimeout(() => {
+    let best = 0, bd = Infinity; cards.forEach((c, k) => { const d = Math.abs(cardX(k) - track.scrollLeft); if (d < bd) { bd = d; best = k; } });
+    const atEnd = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+    if (best !== idx && !(atEnd && idx > best)) { mark(best); schedule(); }
+  }, 120); }, { passive: true });
+  $('#featsPrev').addEventListener('click', () => go(idx - 1));
+  $('#featsNext').addEventListener('click', () => go(idx + 1));
+  btnPlay.addEventListener('click', () => setPaused(!userPaused));
+  dots.forEach((d, k) => d.addEventListener('click', () => go(k)));
+  root.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { hover = true; schedule(); } });
+  root.addEventListener('pointerleave', () => { hover = false; schedule(); });
+  root.addEventListener('focusin', () => { hover = true; schedule(); });
+  root.addEventListener('focusout', () => { hover = false; schedule(); });
+  track.addEventListener('touchstart', () => { if (!userPaused) setPaused(true); }, { passive: true });
+  document.addEventListener('visibilitychange', schedule);
+  new IntersectionObserver(es => { inView = es[0].isIntersecting; schedule(); }, { threshold: 0.35 }).observe(root);
+  root.style.setProperty('--dur', DUR + 'ms');
+  mark(0); setPaused(userPaused);
+})();
