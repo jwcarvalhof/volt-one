@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=20';
-import { EN, RUNTIME } from './i18n.js?v=20';
+import { drawFace } from './face.js?v=22';
+import { EN, RUNTIME } from './i18n.js?v=22';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -199,7 +199,7 @@ setInterval(() => { if (!document.hidden && faceMode !== 'treino') paintFaces();
 const expImgs = $$('.exp__shot img'), expModeName = $('#expModeName');
 function expShots(m = crownMode) {
   expImgs.forEach((im, k) => {
-    const src = `assets/img/exp/exp-${MODE_KEYS[k]}-${lang}.webp?v=2`;
+    const src = `assets/img/exp/exp2-${MODE_KEYS[k]}-${lang}.webp`;
     if (!im.getAttribute('src') || !im.getAttribute('src').endsWith(src)) im.setAttribute('src', src);
     im.classList.toggle('is-active', k === m);
   });
@@ -309,7 +309,8 @@ function buildPoses(mob) {
   const chipA = M({ set: 1, tx: 0, ty: 0, tz: 0, el: 52, az: -16, dist: 5.4, fitA: 1.5, spin: 0, rim: 1 }, { fitA: 0.75, dist: 6.2 });
   const chipB = M({ set: 1, tx: 0, ty: 0, tz: 0, el: 46, az: 14, dist: 4.7, fitA: 1.5, spin: 0, rim: 1 }, { fitA: 0.75, dist: 5.6 });
   return {
-    hero: M({ rx: -55, ry: 14, rz: -90, el: 4, dist: 6.4, fitA: 1.0, shiftX: 0.02, shiftY: -0.1, tx: 0, ty: 0, tz: 0, strap: 0, rim: 1.15, glassI: 0.7, key: -40, spin: 0 }, { dist: 7.8, shiftX: 0.01, shiftY: -0.03, fitA: 0.72 }),
+    hero: M({ rx: -55, ry: 0, rz: -90, el: 4, dist: 6.4, fitA: 1.0, shiftX: 0, shiftY: -0.1, tx: 0, ty: 0, tz: 0, strap: 0, rim: 1.15, glassI: 0.7, key: -40, spin: 0 }, { dist: 7.8, shiftX: 0, shiftY: -0.03, fitA: 0.72 }),
+    introOpen: M({ ...stepBase, ...EX(6), tz: 1.0, dist: 13.2, tags: 0, shiftX: 0, shiftY: -0.14 }, { shiftY: 0.05, fitA: 0.8 }),
     heroHidden: M({ rx: -30, ry: -20, el: 6, dist: 7.6, fitA: 1.0, shiftY: -0.27, tx: 0, ty: 0, tz: 0, strap: 0.35, rim: 1.15, vis: 0 }, { shiftY: -0.02, fitA: 0.85 }),
     approach: M({ rx: -30, ry: -20, el: 6, dist: 6.4, fitA: 1.0, shiftY: -0.27, tx: 0, ty: 0, tz: 0, strap: 0.35, rim: 1.15 }, { shiftY: -0.02, fitA: 0.85 }),
     steps: stepsP,
@@ -406,8 +407,10 @@ function buildMaster() {
   const end = s => s.top + s.r;
   add(0, P.hero);
   pass(0, I.top, P.hero, P.approach);
-  add(end(I), P.approach);
-  pass(end(I), Mt.top, P.approach, P.mats[0][0]);
+  // nesta seção o relógio se desmonta aos poucos, pronto para a seção seguinte
+  add(I.top + 0.25 * I.r, P.approach);
+  add(end(I), P.introOpen, 'power1.inOut');
+  pass(end(I), Mt.top, P.introOpen, P.mats[0][0]);
   for (let i = 0; i < 4; i++) {
     add(Mt.top + (i + 0.28) * L.matLen, P.mats[i][0], 'power2.inOut');
     add(Mt.top + (i + 0.86) * L.matLen, P.mats[i][1], 'sine.inOut');
@@ -478,7 +481,6 @@ function loop(t) {
   par.x += (parT.x - par.x) * k; par.y += (parT.y - par.y) * k;
   if (intro.t0) intro.s += Math.min(dt, 34) / 1000; // passo limitado: em aparelho lento a entrada fica mais lenta, nunca pula
   const RS = introPose();
-  passShift();
   const op = Math.round(clamp(RS.vis) * 1000) / 1000;
   if (op !== lastCanvasOp) { lastCanvasOp = op; glWrap.style.opacity = op; }
   const visible = op > 0.003;
@@ -594,7 +596,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=20'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=22'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
