@@ -122,18 +122,23 @@ section{position:relative}
 /* divisória entre seções de tom diferente (borda com degradê: não usa pseudo-elementos nem muda o posicionamento) */
 #engenharia,#detalhes,#experiencia,#recursos,#especificacoes,#modelos,#encerramento,.foot{border-top:1px solid transparent;border-image:linear-gradient(90deg,transparent 3%,rgba(145,160,186,.28) 20%,rgba(145,160,186,.28) 80%,transparent 97%) 1}
 /* ---------- 1 hero ---------- */
-.hero{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:calc(var(--nav-h) + clamp(40px,8vh,96px)) var(--gutter) 120px;overflow:hidden;background:var(--canvas);isolation:isolate}
-.hero__media{position:absolute;inset:0;z-index:-1}
-.hero__media img{width:100%;height:100%;object-fit:cover;object-position:50% 100%;transform:scale(1.04);animation:heroIn 2.2s var(--ease) forwards}
-.hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,6,12,.55) 0%,rgba(4,6,12,0) 34%),linear-gradient(0deg,var(--canvas) 0%,rgba(4,6,12,0) 22%)}
+.hero{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;padding:calc(var(--nav-h) + clamp(20px,5vh,56px)) var(--gutter) clamp(40px,7vh,76px);overflow:hidden;background:transparent;isolation:isolate}
+.hero__media{position:absolute;inset:0;z-index:-1;transition:opacity .8s var(--ease)}
+.hero__media{display:none}
+.no3d .hero__media{display:block}
+.hero__media img{width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(0deg,var(--canvas) 0%,rgba(4,6,12,0) 14%)}
 .hero > *:not(.hero__media){position:relative;z-index:1}
 @keyframes heroIn{from{opacity:0;transform:scale(1.09)}to{opacity:1;transform:scale(1.04)}}
 .hero__inner{max-width:880px;display:flex;flex-direction:column;align-items:center}
-.hero h1{font-size:clamp(48px,6vw,96px);letter-spacing:-.045em;line-height:.98;margin:0 0 22px}
-.hero .lede{max-width:34ch;margin-inline:auto}
-.cta-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:32px}
+.hero__brand{margin:0 0 10px;font:600 clamp(17px,1.4vw,22px)/1 var(--display);letter-spacing:.02em;color:var(--text)}
+.hero__brand span{font-weight:500;color:var(--text-2)}
+.hero h1{font-size:clamp(44px,5.4vw,84px);letter-spacing:-.045em;line-height:1;margin:0 0 14px}
+.hero .lede{max-width:40ch;margin-inline:auto;font-size:clamp(15px,1.15vw,17px)}
+.cta-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:26px}
 .hero .rise{opacity:0;transform:translateY(22px);animation:rise 1.1s var(--ease) forwards}
 .hero .rise:nth-child(2){animation-delay:.12s}.hero .rise:nth-child(3){animation-delay:.24s}
+.hero > .cta-row{margin-top:0;animation-delay:1.2s}
 @keyframes rise{to{opacity:1;transform:none}}
 .hero > .scroll-cue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:12px;font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
 .scroll-cue i{position:relative;width:1px;height:46px;background:var(--line);overflow:hidden}
@@ -150,9 +155,12 @@ section{position:relative}
 
 /* ---------- 3/4 desmontagem: card de vidro por camada + coluna de peças ---------- */
 .explode{height:calc(100vh + 6 * 95vh)}
-.explode .sticky{display:grid;grid-template-columns:minmax(340px,32vw) 1fr minmax(260px,20vw);align-items:center;gap:20px;padding:var(--nav-h) var(--gutter) 0}
-.box{background:linear-gradient(180deg,rgba(11,14,22,.92),rgba(7,9,15,.92));border:1px solid rgba(255,255,255,.06);border-radius:28px;box-shadow:0 30px 80px -30px rgba(0,0,0,.8);padding:clamp(40px,3.6vw,60px)}
-.explode__panel{align-self:center;min-width:0;max-width:460px}
+.explode .sticky{display:grid;grid-template-columns:minmax(280px,24vw) 1fr minmax(200px,15vw);align-items:center;gap:20px;padding:var(--ft) calc(var(--fx) + var(--fi)) var(--fb)}
+/* moldura: caixa preta com relógio e texto, fundo de fora em outra cor */
+:root{--outer:#1d1d1f;--fx:clamp(16px,12.5vw,260px);--ft:calc(var(--nav-h) + 12px);--fb:clamp(16px,13vh,140px);--fi:clamp(28px,4.6vw,88px)}
+.framed .sticky::before{content:"";position:absolute;z-index:0;pointer-events:none;inset:var(--ft) var(--fx) var(--fb);border-radius:clamp(20px,2vw,30px);box-shadow:0 0 0 200vmax var(--outer)}
+.framed .sticky > *{position:relative;z-index:1}
+.explode__panel{align-self:center;min-width:0;max-width:360px}
 .steps{display:grid}
 .step{grid-area:1/1;opacity:0;transform:translateY(14px);filter:blur(4px);transition:opacity .55s var(--ease),transform .55s var(--ease),filter .55s var(--ease);pointer-events:none}
 .step.is-active{opacity:1;transform:none;filter:none;pointer-events:auto}
@@ -198,15 +206,14 @@ section{position:relative}
 
 /* ---------- 7 detalhes: um item aberto por vez ---------- */
 .details{height:180vh}
-.details .sticky{display:grid;grid-template-columns:minmax(330px,34vw) 1fr;align-items:center;padding:var(--nav-h) var(--gutter) 0}
-.details__col{min-width:0;justify-self:start;width:min(100%,500px)}
-.details__col h2{font-size:clamp(28px,2.4vw,38px);font-weight:500;max-width:18ch;margin:0 0 clamp(28px,4vh,44px)}
-.feats{display:flex;flex-direction:column;border-top:1px solid var(--line)}
-.feat{border-bottom:1px solid var(--line)}
-.feat:last-child{border-bottom:0}
-.feat__btn{display:flex;align-items:center;gap:14px;width:100%;padding:12px 0;text-align:left;font-size:14.5px;font-weight:500;color:var(--text-2);transition:color .35s var(--ease)}
-.feat.open .feat__btn,.feat__btn:hover{color:var(--text)}
-.feat__ic{position:relative;flex:none;width:20px;height:20px;border-radius:50%;border:1px solid rgba(243,246,252,.45);transition:transform .45s var(--ease),background .45s var(--ease),border-color .45s var(--ease)}
+.details .sticky{display:grid;grid-template-columns:minmax(300px,30vw) 1fr;align-items:center;padding:var(--ft) calc(var(--fx) + var(--fi)) var(--fb)}
+.details__col{min-width:0;justify-self:start;width:min(100%,400px)}
+.details__col h2{font-size:clamp(26px,2.2vw,34px);font-weight:500;max-width:16ch;margin:0 0 clamp(20px,3vh,32px)}
+.feats{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.feat{background:#1d1d1f;border-radius:26px;max-width:100%;transition:background .4s var(--ease)}
+.feat:hover{background:#262629}
+.feat__btn{display:flex;align-items:center;gap:12px;width:100%;padding:10px 20px 10px 12px;text-align:left;font-size:14.5px;font-weight:600;color:var(--text)}
+.feat__ic{position:relative;flex:none;width:22px;height:22px;border-radius:50%;border:1.3px solid rgba(243,246,252,.85);transition:transform .45s var(--ease),background .45s var(--ease),border-color .45s var(--ease)}
 .feat__ic::before,.feat__ic::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:1.2px;background:var(--text);border-radius:2px;transform:translate(-50%,-50%)}
 .feat__ic::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .45s var(--ease)}
 .feat.open .feat__ic{background:var(--accent);border-color:var(--accent);transform:rotate(180deg)}
@@ -214,7 +221,7 @@ section{position:relative}
 .feat__body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ease)}
 .feat.open .feat__body{grid-template-rows:1fr}
 .feat__inner{overflow:hidden}
-.feat__inner > div{padding:2px 0 18px 34px;opacity:0;transform:translateY(-6px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
+.feat__inner > div{padding:0 20px 16px 46px;opacity:0;transform:translateY(-6px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
 .feat.open .feat__inner > div{opacity:1;transform:none;transition-delay:.12s}
 .feat__inner p{color:var(--text-3);font-size:14px;line-height:1.6;max-width:36ch}
 .swatches{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
@@ -367,9 +374,7 @@ section{position:relative}
 @media (max-width:720px), (orientation:portrait) and (max-width:1024px){
   :root{--nav-h:60px}
   body{font-size:16px}
-  .hero{justify-content:flex-end;padding-bottom:72px}
-  .hero::before{background:linear-gradient(180deg,rgba(4,6,12,0) 46%,rgba(4,6,12,.85) 66%,var(--canvas) 82%)}
-  .hero__media img{object-position:50% 0}
+  .hero{padding-bottom:40px}
   .hero__inner{position:relative}
   .hero h1{font-size:clamp(42px,11vw,66px);margin:0 0 16px}
   .cta-row{margin-top:26px}
@@ -379,9 +384,10 @@ section{position:relative}
   .intro{height:190vh}
   .intro .sticky{padding-top:calc(var(--nav-h) + 3vh)}
   .explode{height:calc(100vh + 6 * 80vh)}
-  .explode .sticky{align-items:end;padding:0 12px 12px}
+  .explode .sticky{align-items:end;padding:0 22px 26px}
   .explode__panel{align-self:end;max-width:none}
-  .box{padding:24px 22px;border-radius:22px}
+  :root{--fx:8px;--fb:8px;--fi:14px}
+  .framed .sticky::before{border-radius:20px}
   .step h3{font-size:22px;margin:10px 0 8px}
   .step > p:not(.eyebrow){font-size:15px}
   .stat{margin-top:18px}
@@ -394,7 +400,7 @@ section{position:relative}
   .mat{padding:20px}
   .rebuild{height:210vh}
   .details{height:auto}
-  .details .sticky{position:relative;height:auto;min-height:100svh;grid-template-columns:1fr;align-items:end;padding:58svh 14px 48px}
+  .details .sticky{position:relative;height:auto;min-height:100svh;grid-template-columns:1fr;align-items:end;padding:58svh 22px 30px}
   .experience .sticky{grid-template-columns:1fr;gap:36px;padding:90px var(--gutter)}
   .exp__frame{width:100%}
   .exp__copy{grid-column:1}
@@ -459,16 +465,17 @@ section{position:relative}
   <!-- 1 · HERO -->
   <section class="hero" id="topo" aria-labelledby="hero-title">
     <picture class="hero__media" aria-hidden="true">
-      <source media="(max-width: 720px), (orientation: portrait) and (max-width: 1024px)" srcset="assets/img/hero-v-m.webp">
-      <img src="assets/img/hero-v.webp" alt="" width="2400" height="1350" fetchpriority="high" decoding="async">
+      <source media="(max-width: 720px), (orientation: portrait) and (max-width: 1024px)" srcset="assets/img/hero-lay-m.webp">
+      <img src="assets/img/hero-lay.webp" alt="" width="2400" height="1350" fetchpriority="high" decoding="async">
     </picture>
     <div class="hero__inner">
+      <p class="hero__brand rise">VOLT <span>One</span></p>
       <h1 id="hero-title" class="rise" data-i18n="heroTitle">Além do tempo.</h1>
       <p class="lede rise" data-i18n="heroLede">Feito para acompanhar cada movimento, com precisão que dá para sentir.</p>
-      <div class="cta-row rise">
-        <a class="btn btn--primary" href="#engenharia"><span data-i18n="heroCta1">Conheça o VOLT One</span>
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-      </div>
+    </div>
+    <div class="cta-row rise">
+      <a class="btn btn--primary" href="#engenharia"><span data-i18n="heroCta1">Conheça o VOLT One</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     </div>
   </section>
 
@@ -482,9 +489,9 @@ section{position:relative}
   </section>
 
   <!-- 3 e 4 · DESMONTAGEM + COMPONENTES -->
-  <section class="explode" id="desmontagem" aria-labelledby="explode-title">
+  <section class="explode framed" id="desmontagem" aria-labelledby="explode-title">
     <div class="sticky">
-      <div class="explode__panel box">
+      <div class="explode__panel">
         <p class="sr-only" id="explode-title" data-i18n="explodeKicker">Seis camadas, uma intenção</p>
         <div class="steps">
           <article class="step" data-step="0">
@@ -564,9 +571,9 @@ section{position:relative}
   </section>
 
   <!-- 7 · DETALHES -->
-  <section class="details" id="detalhes" aria-labelledby="det-title">
+  <section class="details framed" id="detalhes" aria-labelledby="det-title">
     <div class="sticky">
-      <div class="details__col box">
+      <div class="details__col">
         <h2 id="det-title" data-i18n="detTitle">Feito de pequenas decisões.</h2>
         <div class="feats" id="feats">
           <div class="feat open" data-focus="finish">
@@ -763,6 +770,6 @@ section{position:relative}
 
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-<script type="module" src="assets/js/app.js?v=16"></script>
+<script type="module" src="assets/js/app.js?v=18"></script>
 </body>
 </html>

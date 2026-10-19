@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=16';
-import { EN, RUNTIME } from './i18n.js?v=16';
+import { drawFace } from './face.js?v=18';
+import { EN, RUNTIME } from './i18n.js?v=18';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -307,11 +307,12 @@ function buildPoses(mob) {
   // experiência espelhada: relógio à esquerda, texto à direita
   const exp = M({ rx: -8, ry: -22, el: -3, dist: 8.0, ty: 0.1, shiftX: -0.22, spin: 0, glassI: 0.45 }, { shiftX: 0, shiftY: 0.22, fitA: 1.25 });
   // detalhes: relógio à direita, quase de frente, para os focos de cada item
-  const det = M({ rx: -10, ry: -30, el: 2, dist: 9.4, ty: 0.05, shiftX: 0.2, spin: 0, glassI: 0.18, bgMix: 1 }, { shiftX: 0, shiftY: 0.3, fitA: 1.4 });
+  const det = M({ rx: -10, ry: -30, el: 2, dist: 11.5, ty: 0.05, shiftX: 0.2, spin: 0, glassI: 0.18, bgMix: 1 }, { shiftX: 0, shiftY: 0.3, fitA: 1.4 });
   // especificações: close do processador aceso, visto por dentro do vidro
   const chipA = M({ set: 1, tx: 0, ty: 0, tz: 0, el: 52, az: -16, dist: 5.4, fitA: 1.5, spin: 0, rim: 1 }, { fitA: 0.75, dist: 6.2 });
   const chipB = M({ set: 1, tx: 0, ty: 0, tz: 0, el: 46, az: 14, dist: 4.7, fitA: 1.5, spin: 0, rim: 1 }, { fitA: 0.75, dist: 5.6 });
   return {
+    hero: M({ rx: -55, ry: 14, rz: -90, el: 4, dist: 6.4, fitA: 1.0, shiftX: 0.02, shiftY: -0.1, tx: 0, ty: 0, tz: 0, strap: 0, rim: 1.15, glassI: 0.7, key: -40, spin: 0 }, { dist: 7.8, shiftX: 0.01, shiftY: -0.03, fitA: 0.72 }),
     heroHidden: M({ rx: -30, ry: -20, el: 6, dist: 7.6, fitA: 1.0, shiftY: -0.27, tx: 0, ty: 0, tz: 0, strap: 0.35, rim: 1.15, vis: 0 }, { shiftY: -0.02, fitA: 0.85 }),
     approach: M({ rx: -30, ry: -20, el: 6, dist: 6.4, fitA: 1.0, shiftY: -0.27, tx: 0, ty: 0, tz: 0, strap: 0.35, rim: 1.15 }, { shiftY: -0.02, fitA: 0.85 }),
     steps: stepsP,
@@ -332,6 +333,14 @@ function buildPoses(mob) {
 
 /* ---------------- 3D ---------------- */
 const S = { ...DEF, vis: 0, screen: 1 };
+// giro de entrada da hero: 0 = começando, 1 = pousado
+const intro = { k: 1 };
+function introPose() {
+  if (intro.t0) { const u = Math.min(1, Math.max(0, (performance.now() - intro.t0) / 2600)); intro.k = 1 - Math.pow(1 - u, 3); if (u >= 1) intro.t0 = 0; }
+  if (intro.k >= 1) return S;
+  const e = intro.k, r = 1 - e;
+  return { ...S, rz: S.rz + r * 150, ry: S.ry - r * 70, rx: S.rx + r * 35, dist: S.dist + r * 3.2, vis: S.vis * Math.min(1, e * 3) };
+}
 let three = null, running = false, rafOn = false, master = null, masterST = null;
 if (stillDebug) window.__volt = { S, get L() { return L; }, get tl() { return master; } };
 let canvas = $('#gl');
@@ -381,9 +390,9 @@ function buildMaster() {
   const vh = L.vh, I = L.intro, E = L.explode, Mt = L.mat, R = L.rebuild, D = L.det, X = L.exp, Sp = L.specs, C = L.close;
   const K = [];
   const add = (y, pose, ease) => K.push([y, pose, ease]);
-  // o topo é uma fotografia: o relógio 3D só acende na transição
-  add(0, P.heroHidden);
-  add(Math.max(1, I.top - vh * 0.35), P.heroHidden);
+  // o topo mostra o relógio 3D deitado, com a coroa para a frente
+  add(0, P.hero);
+  add(Math.max(1, I.top - vh * 0.75), P.hero);
   add(I.top + 0.45 * I.r, P.approach);
   add(I.top + I.r, P.steps[0]);
   for (let i = 0; i < 6; i++) {
@@ -444,17 +453,18 @@ function loop(t) {
   const dt = lastFrameT ? t - lastFrameT : 16; lastFrameT = t;
   const k = 1 - Math.pow(1 - 0.08, Math.min(100, dt) / 16.667);
   par.x += (parT.x - par.x) * k; par.y += (parT.y - par.y) * k;
-  const op = Math.round(clamp(S.vis) * 1000) / 1000;
+  const RS = introPose();
+  const op = Math.round(clamp(RS.vis) * 1000) / 1000;
   if (op !== lastCanvasOp) { lastCanvasOp = op; glWrap.style.opacity = op; }
   const visible = op > 0.003;
   const still = mqReduce.matches || stillDebug;
-  const animating = (!still && (S.spin > 0.01 || S.set > 0.5)) || three.isAnimating();
+  const animating = (!still && (S.spin > 0.01 || S.set > 0.5)) || three.isAnimating() || intro.k < 1;
   const parMoving = Math.abs(parT.x - par.x) + Math.abs(parT.y - par.y) > 0.0008;
   if (visible) {
     S.screen = screenFlash * (faceMode === 'noite' ? 0.6 : 1);
     // movimento ocioso a ~30 fps para poupar bateria; rolagem e interação vão a 60
-    if (!(idleSkip && animating && !parMoving && t - lastScrub > 150)) {
-      three.render(S, still ? 0 : t, par, fx);
+    if (!(idleSkip && animating && intro.k >= 1 && !parMoving && t - lastScrub > 150)) {
+      three.render(RS, still ? 0 : t, par, fx);
       updateOverlay();
       trackPerf(dt);
     }
@@ -558,7 +568,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=16'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=18'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
@@ -574,6 +584,9 @@ async function boot3D() {
   addEventListener('pointermove', onPointer, { passive: true });
   addEventListener('resize', onResize);
   renderCrown();
+  if (window.gsap && !mqReduce.matches && !stillDebug && scrollY < innerHeight * 0.5) {
+    intro.k = 0; intro.t0 = performance.now() + 150;
+  }
   invalidate();
   requestAnimationFrame(() => requestAnimationFrame(() => { root.classList.remove('is-3d-loading'); root.classList.add('is-3d-ready'); }));
 }
