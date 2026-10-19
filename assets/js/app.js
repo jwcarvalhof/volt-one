@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=23';
-import { EN, RUNTIME } from './i18n.js?v=23';
+import { drawFace } from './face.js?v=25';
+import { EN, RUNTIME } from './i18n.js?v=25';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -432,11 +432,14 @@ function buildMaster() {
   // o relógio da experiência apaga antes da seção de recursos (fotos); o chip só acende nas especificações
   const F = L.feats;
   const a0 = F.top - vh * 0.75, a1 = F.top - vh * 0.3, a2 = Sp.top - vh * 0.1;
-  const b0 = Math.max(a2 + 10, Sp.top + Sp.h - vh * 0.75), b1 = Math.max(b0 + 10, L.family.top - vh * 0.55);
+  const b0 = Math.max(Sp.top + vh * 0.25 + 10, Sp.top + Sp.h - vh * 0.75), b1 = Math.max(b0 + 10, L.family.top - vh * 0.55);
   add(a1, P.expHidden);
   add(a1 + 1, P.chipAHidden);
-  add(Math.max(a1 + 2, Sp.top - vh * 0.55), P.chipAHidden);
-  add(a2, P.chipA, 'power1.out');
+  // a placa chega de perto e recua (zoom out) até o enquadramento final
+  const zA = (k, v) => ({ ...P.chipA, dist: P.chipA.dist * k, vis: v });
+  add(Math.max(a1 + 2, Sp.top - vh * 0.6), zA(0.42, 0));
+  add(Sp.top - vh * 0.35, zA(0.5, 1), 'power1.out');
+  add(Sp.top + vh * 0.25, P.chipA, 'power2.out');
   add(b0, P.chipB, 'sine.inOut');
   add(b1, P.chipBHidden, 'power1.in');
   // o encerramento é uma fotografia: o 3D termina apagado
@@ -466,10 +469,11 @@ function frameShift() {
   if (master && L && frameRange) {
     const y = master.progress() * L.max, [a, b, c, d] = frameRange;
     if (y >= a && y <= d) {
+      // o relógio não se move: a caixa desliza e funciona como uma janela por cima dele
       const off = Math.round(y < b ? b - y : y > c ? -(y - c) : 0);
-      if (off) tf = `translate3d(0,${off}px,0)`;
       const st = sec.det.querySelector('.sticky'), cs = getComputedStyle(st, '::before');
-      if (!mqMobile.matches) cp = `inset(${cs.top} ${cs.right} ${cs.bottom} ${cs.left} round ${cs.borderTopLeftRadius})`;
+      const T0 = parseFloat(cs.top) + off, B0 = parseFloat(cs.bottom) - off;
+      if (!mqMobile.matches) cp = `inset(${Math.max(0, T0)}px ${cs.right} ${Math.max(0, B0)}px ${cs.left} round ${cs.borderTopLeftRadius})`;
     }
   }
   const k = tf + '|' + cp;
@@ -617,7 +621,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=23'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=25'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
@@ -676,7 +680,7 @@ const FOCUS = {
   strap: { rx: 46, ry: -14, zoom: 1.18, tx: 0, ty: -0.7, tz: 0.2 }
 };
 const feats = $$('.feat');
-let fxTween = null, curFocus = 'finish', detVisible = false;
+let fxTween = null, curFocus = 'finish', detVisible = true;
 function focusTo(key) {
   const f = FOCUS[detVisible ? key : 'finish'] || FOCUS.finish;
   if (fxTween) fxTween.kill();
@@ -697,10 +701,6 @@ $$('.swatch').forEach(b => b.addEventListener('click', () => {
   $$('.swatch').forEach(s => s.setAttribute('aria-pressed', String(s === b)));
   if (three) { three.setFinish(+b.dataset.finish); invalidate(); }
 }));
-new IntersectionObserver(es => es.forEach(en => {
-  detVisible = en.isIntersecting;
-  focusTo(curFocus);
-}), { threshold: 0.45 }).observe(sec.det);
 
 /* início */
 setTimeout(() => { if (!three) heroIn(); }, 9000); // garantia: o texto da hero aparece mesmo se o 3D não subir
