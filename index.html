@@ -151,16 +151,21 @@ section{position:relative}
 /* ---------- 3/4 desmontagem: card de vidro por camada + coluna de peças ---------- */
 .explode{height:calc(100vh + 6 * 95vh)}
 .explode .sticky{display:grid;grid-template-columns:minmax(340px,32vw) 1fr minmax(260px,20vw);align-items:center;gap:20px;padding:var(--nav-h) var(--gutter) 0}
-.explode__panel{align-self:center;min-width:0;padding:34px 38px 34px}
-.explode__head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:34px}
+.explode__panel{align-self:center;min-width:0;max-width:400px;padding:0;text-shadow:0 2px 24px rgba(4,6,12,.9)}
+.explode__head{margin-bottom:clamp(40px,7vh,72px)}
 .steps{display:grid}
 .step{grid-area:1/1;opacity:0;transform:translateY(14px);filter:blur(4px);transition:opacity .55s var(--ease),transform .55s var(--ease),filter .55s var(--ease);pointer-events:none}
 .step.is-active{opacity:1;transform:none;filter:none;pointer-events:auto}
-.step h3{font-size:clamp(26px,2.2vw,34px);margin:12px 0 16px;max-width:17ch}
-.step > p{color:var(--text-2);max-width:40ch;font-size:16px;line-height:1.65}
-.stat{display:flex;flex-direction:column;gap:8px;margin-top:30px;padding-top:24px;border-top:1px solid var(--line)}
-.stat b{font:600 clamp(34px,3vw,46px)/1 var(--display);letter-spacing:-.03em;white-space:nowrap;background:linear-gradient(180deg,#fff,#b9cbff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.stat span{font-size:14px;line-height:1.45;color:var(--text-3);max-width:32ch}
+.step__n{display:flex;align-items:center;gap:12px;margin:0 0 22px;font:500 13px/1 var(--display);letter-spacing:.12em;color:var(--text)}
+.step__n i{width:44px;height:1px;background:linear-gradient(90deg,var(--glow),rgba(145,160,186,.25))}
+.step__n span{color:var(--text-3)}
+.step .eyebrow{margin:0}
+.step h3{font-size:clamp(30px,2.6vw,42px);font-weight:500;letter-spacing:-.03em;line-height:1.08;margin:14px 0 18px;max-width:14ch}
+.step > p:not(.step__n,.eyebrow){color:var(--text-3);max-width:34ch;font-size:15.5px;line-height:1.65;margin:0}
+.step > p strong{color:var(--text-2);font-weight:500}
+.stat{display:flex;align-items:baseline;gap:14px;margin-top:clamp(36px,6vh,56px)}
+.stat b{font:400 clamp(30px,2.4vw,38px)/1 var(--display);letter-spacing:-.03em;white-space:nowrap;color:var(--text)}
+.stat span{font-size:13px;line-height:1.45;color:var(--text-3);max-width:22ch}
 .gauge{--slot:118px;grid-column:3;list-style:none;position:relative;justify-self:end;width:100%;height:calc(var(--slot) * 3.4);margin:0;padding:0;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 26%,#000 74%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 26%,#000 74%,transparent 100%)}
 .gauge li{position:absolute;left:0;right:0;top:50%;transform:translateY(calc(-50% + var(--d,0) * var(--slot))) scale(var(--s,.8));transform-origin:left center;opacity:var(--o,0);transition:transform .8s var(--ease),opacity .8s var(--ease)}
 .gauge li.is-active:not([style]){--o:1;--s:1}
@@ -198,10 +203,10 @@ section{position:relative}
 .details{height:180vh}
 .details .sticky{display:grid;grid-template-columns:minmax(330px,34vw) 1fr;align-items:center;padding:var(--nav-h) var(--gutter) 0}
 .details__col{min-width:0}
-.details__col h2{font-size:clamp(30px,3.2vw,46px);max-width:15ch;margin:0 0 clamp(32px,5vh,52px)}
-.feats{display:flex;flex-direction:column;max-width:400px;border-top:1px solid var(--line)}
+.details__col h2{font-size:clamp(28px,2.6vw,40px);font-weight:500;max-width:14ch;margin:0 0 clamp(28px,4vh,44px)}
+.feats{display:flex;flex-direction:column;max-width:340px;border-top:1px solid var(--line)}
 .feat{border-bottom:1px solid var(--line)}
-.feat__btn{display:flex;align-items:center;gap:14px;width:100%;padding:17px 0;text-align:left;font-size:15.5px;font-weight:500;color:var(--text-2);transition:color .35s var(--ease)}
+.feat__btn{display:flex;align-items:center;gap:14px;width:100%;padding:12px 0;text-align:left;font-size:14.5px;font-weight:500;color:var(--text-2);transition:color .35s var(--ease)}
 .feat.open .feat__btn,.feat__btn:hover{color:var(--text)}
 .feat__ic{position:relative;flex:none;width:20px;height:20px;border-radius:50%;border:1px solid rgba(243,246,252,.45);transition:transform .45s var(--ease),background .45s var(--ease),border-color .45s var(--ease)}
 .feat__ic::before,.feat__ic::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:1.2px;background:var(--text);border-radius:2px;transform:translate(-50%,-50%)}
@@ -211,9 +216,9 @@ section{position:relative}
 .feat__body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ease)}
 .feat.open .feat__body{grid-template-rows:1fr}
 .feat__inner{overflow:hidden}
-.feat__inner > div{padding:0 0 22px 34px;opacity:0;transform:translateY(-6px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
+.feat__inner > div{padding:2px 0 18px 34px;opacity:0;transform:translateY(-6px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
 .feat.open .feat__inner > div{opacity:1;transform:none;transition-delay:.12s}
-.feat__inner p{color:var(--text-3);font-size:14.5px;line-height:1.6;max-width:36ch}
+.feat__inner p{color:var(--text-3);font-size:14px;line-height:1.6;max-width:36ch}
 .swatches{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
 .swatch{display:flex;align-items:center;gap:9px;padding:5px 12px 5px 5px;border-radius:999px;border:1px solid var(--line);font-size:13px;color:var(--text-2);transition:border-color .3s var(--ease),color .3s var(--ease)}
 .swatch i{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.35),inset 0 -2px 4px rgba(0,0,0,.4)}
@@ -284,13 +289,13 @@ section{position:relative}
 .rec.playing .rec__dots button.on i::after{animation:fdot var(--dur,5.5s) linear forwards}
 @keyframes fdot{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 /* ---------- 9 especificações sobre o chip ---------- */
-.specs{padding:clamp(120px,20vh,200px) var(--gutter) clamp(110px,16vh,170px);text-align:center}
+.specs{padding:clamp(160px,26vh,260px) var(--gutter) clamp(160px,24vh,240px);text-align:center}
 .specs::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,6,12,0),rgba(4,6,12,.45) 16%,rgba(4,6,12,.55) 40%,rgba(4,6,12,.82) 62%,rgba(4,6,12,.82) 90%,rgba(4,6,12,0))}
 .specs > *{position:relative}
 .specs__head{max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
 .specs__head h2{font-size:clamp(38px,4.8vw,72px);letter-spacing:-.04em;margin:20px 0 20px}
 .specs__head p{color:var(--text-2);max-width:52ch}
-.stats{max-width:1080px;margin:clamp(56px,9vh,96px) auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.stats{max-width:1000px;margin:clamp(96px,16vh,160px) auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
 .stats div{display:flex;flex-direction:column;align-items:center;gap:6px;text-shadow:0 2px 22px rgba(4,7,13,.95),0 0 2px rgba(4,7,13,.6)}
 .stats small{font-size:14px;color:var(--text-3)}
 .stats b{font:600 clamp(34px,3.6vw,54px)/1.05 var(--display);letter-spacing:-.035em;color:var(--text)}
@@ -305,11 +310,11 @@ section{position:relative}
 .bcard .big small{font-size:13px;color:var(--text-3)}
 .bcard .big b{font:600 clamp(32px,3vw,44px)/1 var(--display);letter-spacing:-.035em}
 .bcard .big span{font-size:13.5px;color:var(--text-2);max-width:24ch}
-.feats-grid{max-width:1180px;margin:clamp(72px,11vh,120px) auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(48px,7vh,72px) clamp(28px,3.4vw,52px)}
+.feats-grid{max-width:1080px;margin:clamp(120px,20vh,200px) auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(72px,11vh,110px) clamp(48px,5vw,88px)}
 .fcol{display:flex;flex-direction:column;align-items:center;text-align:center;text-shadow:0 2px 18px rgba(4,6,12,.95),0 0 3px rgba(4,6,12,.8)}
-.fi{width:46px;height:46px;fill:none;stroke:var(--text);stroke-width:1.15;stroke-linecap:round;stroke-linejoin:round;margin-bottom:22px}
+.fi{width:38px;height:38px;fill:none;stroke:var(--text);stroke-width:1.15;stroke-linecap:round;stroke-linejoin:round;margin-bottom:22px}
 .fcol h3{font-size:clamp(19px,1.5vw,22px);letter-spacing:-.015em;line-height:1.25;max-width:16ch;min-height:2.5em;display:flex;align-items:flex-end;justify-content:center}
-.fcol p{margin-top:22px;padding-top:22px;border-top:1px solid var(--line-2);width:100%;color:var(--text-2);font-size:16px;line-height:1.6}
+.fcol p{margin-top:14px;max-width:30ch;color:var(--text-3);font-size:14.5px;line-height:1.65}
 .feats-grid .reveal:nth-child(3n+2).in{transition-delay:.1s}.feats-grid .reveal:nth-child(3n).in{transition-delay:.2s}
 .specs__note{max-width:70ch;margin:28px auto 0;font-size:14px;color:var(--text-3)}
 .specs .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
@@ -377,12 +382,13 @@ section{position:relative}
   .intro .sticky{padding-top:calc(var(--nav-h) + 3vh)}
   .explode{height:calc(100vh + 6 * 80vh)}
   .explode .sticky{align-items:end;padding:0 12px 12px}
-  .explode__panel{align-self:end;padding:20px 20px 16px}
+  .explode__panel{align-self:end;max-width:none;padding:22px 6px 10px;background:linear-gradient(180deg,rgba(4,6,12,0),rgba(4,6,12,.92) 40px)}
   .explode__head{display:none}
   .step h3{font-size:22px;margin:10px 0 8px}
-  .step > p{font-size:15px}
-  .stat{margin-top:16px;padding-top:14px;gap:6px}
-  .stat b{font-size:28px}
+  .step > p:not(.step__n,.eyebrow){font-size:15px}
+  .step__n{margin-bottom:12px}
+  .stat{margin-top:18px}
+  .stat b{font-size:26px}
   .stat span{font-size:13px}
   .tag.is-active span{display:inline-block}
   .materials{height:calc(100vh + 4 * 76vh)}
@@ -416,7 +422,6 @@ section{position:relative}
 @media (max-height:620px) and (min-width:721px){
   .hero > .scroll-cue{display:none}
   .gauge{--slot:92px}
-  .explode__panel{padding:20px 24px}
 }
 
 /* ---------- movimento reduzido: estados finais, nada desliza ---------- */
@@ -457,8 +462,8 @@ section{position:relative}
   <!-- 1 · HERO -->
   <section class="hero" id="topo" aria-labelledby="hero-title">
     <picture class="hero__media" aria-hidden="true">
-      <source media="(max-width: 720px), (orientation: portrait) and (max-width: 1024px)" srcset="assets/img/hero-side-m.webp">
-      <img src="assets/img/hero-side.webp" alt="" width="2400" height="1350" fetchpriority="high" decoding="async">
+      <source media="(max-width: 720px), (orientation: portrait) and (max-width: 1024px)" srcset="assets/img/hero-side2-m.webp">
+      <img src="assets/img/hero-side2.webp" alt="" width="2400" height="1350" fetchpriority="high" decoding="async">
     </picture>
     <div class="hero__inner">
       <h1 id="hero-title" class="rise" data-i18n="heroTitle">Além do tempo.</h1>
@@ -482,43 +487,49 @@ section{position:relative}
   <!-- 3 e 4 · DESMONTAGEM + COMPONENTES -->
   <section class="explode" id="desmontagem" aria-labelledby="explode-title">
     <div class="sticky">
-      <div class="explode__panel glass">
+      <div class="explode__panel">
         <div class="explode__head"><p class="kicker" id="explode-title" data-i18n="explodeKicker">Seis camadas, uma intenção</p></div>
         <div class="steps">
           <article class="step" data-step="0">
+            <p class="step__n" aria-hidden="true">01<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p1">Vidro de safira</p>
-            <h3 data-i18n="s1t">Precisão na superfície. Resistência em cada detalhe.</h3>
-            <p data-i18n="s1p">A primeira camada é a que você toca. O conceito usa safira, material escolhido na relojoaria por <strong>resistir bem a riscos</strong>, para manter a leitura limpa mesmo depois de muito uso.</p>
+            <h3 data-i18n="s1t">Feito para durar.</h3>
+            <p data-i18n="s1p">A camada que você toca. Safira, escolhida na relojoaria por <strong>resistir bem a riscos</strong>.</p>
             <div class="stat"><b>9</b><span data-i18n="s1s">na escala de Mohs, a dureza da safira</span></div>
           </article>
           <article class="step" data-step="1">
+            <p class="step__n" aria-hidden="true">02<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p2">Moldura de titânio</p>
-            <h3 data-i18n="s2t">Uma estrutura pensada para proteger o que importa.</h3>
-            <p data-i18n="s2p">A moldura prende o vidro e desenha o contorno do relógio. Titânio entra no projeto pela relação entre <strong>leveza e rigidez</strong>, com um acabamento que não disputa atenção com a tela.</p>
+            <h3 data-i18n="s2t">Leve e firme.</h3>
+            <p data-i18n="s2p">Prende o vidro e desenha o contorno. Titânio pela relação entre <strong>leveza e rigidez</strong>.</p>
             <div class="stat"><b data-i18n="s2v">Grau 5</b><span data-i18n="s2s">titânio proposto para caixa e moldura</span></div>
           </article>
           <article class="step" data-step="2">
+            <p class="step__n" aria-hidden="true">03<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p3">Tela AMOLED</p>
             <h3 data-i18n="s3t">Luz só onde precisa.</h3>
-            <p data-i18n="s3p">Logo abaixo do vidro fica o módulo de tela circular. Em uma tela AMOLED cada pixel acende sozinho, então <strong>o preto é preto de verdade</strong> e a interface gasta energia só com o que aparece.</p>
+            <p data-i18n="s3p">Cada pixel acende sozinho, então <strong>o preto é preto de verdade</strong> e a tela só gasta com o que aparece.</p>
             <div class="stat"><b>466 × 466</b><span data-i18n="s3s">pixels em 1,43 polegada, na proposta</span></div>
           </article>
           <article class="step" data-step="3">
+            <p class="step__n" aria-hidden="true">04<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p4">Placa principal</p>
-            <h3 data-i18n="s4t">Tudo o que decide, em pouco espaço.</h3>
-            <p data-i18n="s4p">Processador, memória e conexões dividem uma placa compacta. Concentrar os componentes <strong>libera volume para a bateria</strong> logo abaixo.</p>
+            <h3 data-i18n="s4t">Tudo em pouco espaço.</h3>
+            <p data-i18n="s4p">Processador, memória e rádios em uma placa compacta, que <strong>libera espaço para a bateria</strong>.</p>
             <div class="stat"><b data-i18n="s4v">4 rádios</b><span data-i18n="s4s">Bluetooth, Wi-Fi, NFC e GPS na mesma placa</span></div>
           </article>
           <article class="step" data-step="4">
+            <p class="step__n" aria-hidden="true">05<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p5">Sensores ópticos</p>
-            <h3 data-i18n="s5t">Informação captada com precisão, apresentada no momento certo.</h3>
-            <p data-i18n="s5p">Na tampa traseira, LEDs e fotodiodos ficam encostados no pulso e <strong>leem variações de luz na pele</strong>. O relógio transforma essa leitura em dados de movimento e atividade. É um conceito de bem-estar, não um dispositivo médico.</p>
+            <h3 data-i18n="s5t">Lê o pulso pela luz.</h3>
+            <p data-i18n="s5p">LEDs e fotodiodos <strong>leem variações de luz na pele</strong>. Conceito de bem-estar, não dispositivo médico.</p>
             <div class="stat"><b>4 + 4</b><span data-i18n="s5s">LEDs e fotodiodos sob uma janela de safira</span></div>
           </article>
           <article class="step" data-step="5">
+            <p class="step__n" aria-hidden="true">06<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p6">Bateria</p>
-            <h3 data-i18n="s6t">Cada camada contribui para uma experiência mais integrada.</h3>
-            <p data-i18n="s6p">A bateria ocupa o maior volume interno. Tela, processador e sensores foram pensados para <strong>consumir pouco juntos</strong>, em vez de depender só de uma bateria maior.</p>
+            <h3 data-i18n="s6t">Energia bem dividida.</h3>
+            <p data-i18n="s6p">O maior volume interno. Tela, processador e sensores pensados para <strong>consumir pouco juntos</strong>.</p>
             <div class="stat"><b data-i18n="s6v">Até 3 dias</b><span data-i18n="s6s">meta de autonomia, ainda sem teste</span></div>
           </article>
         </div>
@@ -704,27 +715,6 @@ section{position:relative}
       <div class="reveal"><small data-i18n="st3l">Tela AMOLED</small><b>466 × 466</b><span data-i18n="st3s">pixels em 1,43 polegada</span></div>
     </div>
 
-    <div class="bento">
-      <article class="bcard glass wide reveal">
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.2 2.5 5.6 13.4c-.3.5 0 1.1.6 1.1H11l-1.4 7c-.1.6.6.9 1 .4l7.8-11c.3-.5 0-1.1-.6-1.1H13l1.2-6.8c.1-.6-.6-.9-1-.5Z"/></svg>
-          <h3 data-i18n="b1t">Energia que acompanha o seu ritmo.</h3>
-          <p data-i18n="b1p">Tela, processador e sensores foram desenhados para gastar pouco juntos. A meta é <strong>até 3 dias de uso típico</strong> com uma carga, e a recarga acontece <strong>sem fio, na base magnética</strong>.</p>
-        </div>
-        <div class="big"><small data-i18n="b1l">Perfis de energia</small><b data-i18n="b1v">4 modos</b><span data-i18n="b1s">um para cada momento da tela: dia, treino, foco e noite</span></div>
-      </article>
-      <article class="bcard glass reveal">
-        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8c-.3 0-.5.1-.7.4C9.6 5.6 5.5 11 5.5 14.5a6.5 6.5 0 0 0 13 0c0-3.5-4.1-8.9-5.8-11.3-.2-.3-.4-.4-.7-.4Z" /><path d="M9 15.2a3 3 0 0 0 3 2.8"/></svg>
-        <h3 data-i18n="b2t">Feito para o dia inteiro.</h3>
-        <p data-i18n="b2p"><strong>Safira</strong> na frente, <strong>cerâmica</strong> atrás e titânio no meio. A meta de projeto inclui chuva, piscina e suor.</p>
-      </article>
-      <article class="bcard glass reveal">
-        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12h4l2-5 3.5 10 2.5-6.5 1.5 1.5h5.5"/></svg>
-        <h3 data-i18n="b3t">Leitura óptica no pulso.</h3>
-        <p data-i18n="b3p">Quatro LEDs e quatro fotodiodos medem variações de luz na pele. <strong>Conceito de bem-estar</strong>, sem fins médicos.</p>
-      </article>
-    </div>
-
     <div class="feats-grid">
       <article class="fcol reveal"><svg class="fi" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="11"/><path d="M24 17v7l4.5 3"/></svg><h3 data-i18n="sp1t">Tela AMOLED</h3><p data-i18n="sp1p">AMOLED circular de 1,43 polegada, com 466 × 466 pixels sob um vidro de safira plano de borda chanfrada.</p></article>
       <article class="fcol reveal"><svg class="fi" viewBox="0 0 48 48" aria-hidden="true"><path d="M15 9h18l9 12-18 19L6 21z"/><path d="M6 21h36M18 9l6 31 6-31"/></svg><h3 data-i18n="sp2t">Titânio, safira e cerâmica</h3><p data-i18n="sp2p">Caixa e moldura em titânio escovado, coroa serrilhada com anel azul anodizado e traseira em cerâmica com janela de safira.</p></article>
@@ -733,7 +723,6 @@ section{position:relative}
       <article class="fcol reveal"><svg class="fi" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 19a20 20 0 0 1 28 0M15 25a12.5 12.5 0 0 1 18 0M20 31a5.5 5.5 0 0 1 8 0"/><circle cx="24" cy="37" r="1.6"/></svg><h3 data-i18n="sp5t">Conectividade completa</h3><p data-i18n="sp5p">Bluetooth LE, Wi-Fi, NFC para pagamentos e GPS de dupla frequência. Controle pela coroa giratória, pelo botão lateral e pelo toque.</p></article>
       <article class="fcol reveal"><svg class="fi" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="16" width="30" height="16" rx="4"/><path d="M41 21.5v5"/><path d="m23.5 19.5-4 5h5l-4 5"/></svg><h3 data-i18n="sp6t">Até 3 dias de meta</h3><p data-i18n="sp6p">Bateria de íon de lítio com meta de até 3 dias em uso típico, ainda sem teste. Recarga sem fio na base magnética e um perfil de energia por modo.</p></article>
     </div>
-    <p class="specs__note" data-i18n="specNote">Nenhum valor aqui foi medido. Tamanho, tela e autonomia são metas do conceito e servem para manter o projeto coerente entre as seções.</p>
   </section>
 
   <!-- 9b · OUTROS MODELOS -->
@@ -783,6 +772,6 @@ section{position:relative}
 
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-<script type="module" src="assets/js/app.js?v=14"></script>
+<script type="module" src="assets/js/app.js?v=15"></script>
 </body>
 </html>
