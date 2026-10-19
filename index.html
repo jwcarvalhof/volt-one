@@ -151,16 +151,16 @@ section{position:relative}
 /* ---------- 3/4 desmontagem: card de vidro por camada + coluna de peças ---------- */
 .explode{height:calc(100vh + 6 * 95vh)}
 .explode .sticky{display:grid;grid-template-columns:minmax(340px,32vw) 1fr minmax(260px,20vw);align-items:center;gap:20px;padding:var(--nav-h) var(--gutter) 0}
-.explode__panel{align-self:center;min-width:0;padding:30px 32px 26px}
-.explode__head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:18px;margin-bottom:22px;border-bottom:1px solid var(--line)}
+.explode__panel{align-self:center;min-width:0;padding:34px 38px 34px}
+.explode__head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:34px}
 .steps{display:grid}
 .step{grid-area:1/1;opacity:0;transform:translateY(14px);filter:blur(4px);transition:opacity .55s var(--ease),transform .55s var(--ease),filter .55s var(--ease);pointer-events:none}
 .step.is-active{opacity:1;transform:none;filter:none;pointer-events:auto}
-.step h3{font-size:clamp(26px,2.2vw,34px);margin:14px 0 14px;max-width:17ch}
-.step > p{color:var(--text-2);max-width:42ch;font-size:16.5px}
-.stat{display:flex;align-items:baseline;gap:14px;margin-top:22px;padding:16px 18px;border-radius:16px;background:rgba(4,6,12,.4);border:1px solid var(--line)}
-.stat b{font:600 clamp(26px,2.2vw,34px)/1 var(--display);letter-spacing:-.03em;white-space:nowrap;background:linear-gradient(180deg,#fff,#b9cbff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.stat span{font-size:14px;line-height:1.4;color:var(--text-2)}
+.step h3{font-size:clamp(26px,2.2vw,34px);margin:12px 0 16px;max-width:17ch}
+.step > p{color:var(--text-2);max-width:40ch;font-size:16px;line-height:1.65}
+.stat{display:flex;flex-direction:column;gap:8px;margin-top:30px;padding-top:24px;border-top:1px solid var(--line)}
+.stat b{font:600 clamp(34px,3vw,46px)/1 var(--display);letter-spacing:-.03em;white-space:nowrap;background:linear-gradient(180deg,#fff,#b9cbff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{font-size:14px;line-height:1.45;color:var(--text-3);max-width:32ch}
 .gauge{--slot:118px;grid-column:3;list-style:none;position:relative;justify-self:end;width:100%;height:calc(var(--slot) * 3.4);margin:0;padding:0;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 26%,#000 74%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 26%,#000 74%,transparent 100%)}
 .gauge li{position:absolute;left:0;right:0;top:50%;transform:translateY(calc(-50% + var(--d,0) * var(--slot))) scale(var(--s,.8));transform-origin:left center;opacity:var(--o,0);transition:transform .8s var(--ease),opacity .8s var(--ease)}
 .gauge li.is-active:not([style]){--o:1;--s:1}
@@ -198,25 +198,25 @@ section{position:relative}
 .details{height:180vh}
 .details .sticky{display:grid;grid-template-columns:minmax(330px,34vw) 1fr;align-items:center;padding:var(--nav-h) var(--gutter) 0}
 .details__col{min-width:0}
-.details__col h2{font-size:clamp(30px,3.2vw,48px);max-width:15ch;margin:16px 0 26px}
-.feats{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
-.feat{border-radius:26px;transition:background .45s var(--ease),border-color .45s var(--ease),box-shadow .45s var(--ease),width .45s var(--ease);max-width:440px}
-.feat:not(.open){background:rgba(14,19,30,.55);border-color:rgba(255,255,255,.06);box-shadow:none}
-.feat__btn{display:flex;align-items:center;gap:14px;width:100%;padding:13px 22px 13px 14px;text-align:left;font-size:16.5px;font-weight:600;color:var(--text)}
-.feat__ic{position:relative;flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(243,246,252,.8);transition:transform .45s var(--ease),background .45s var(--ease),border-color .45s var(--ease)}
-.feat__ic::before,.feat__ic::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:1.5px;background:var(--text);border-radius:2px;transform:translate(-50%,-50%)}
+.details__col h2{font-size:clamp(30px,3.2vw,46px);max-width:15ch;margin:0 0 clamp(32px,5vh,52px)}
+.feats{display:flex;flex-direction:column;max-width:400px;border-top:1px solid var(--line)}
+.feat{border-bottom:1px solid var(--line)}
+.feat__btn{display:flex;align-items:center;gap:14px;width:100%;padding:17px 0;text-align:left;font-size:15.5px;font-weight:500;color:var(--text-2);transition:color .35s var(--ease)}
+.feat.open .feat__btn,.feat__btn:hover{color:var(--text)}
+.feat__ic{position:relative;flex:none;width:20px;height:20px;border-radius:50%;border:1px solid rgba(243,246,252,.45);transition:transform .45s var(--ease),background .45s var(--ease),border-color .45s var(--ease)}
+.feat__ic::before,.feat__ic::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:1.2px;background:var(--text);border-radius:2px;transform:translate(-50%,-50%)}
 .feat__ic::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .45s var(--ease)}
 .feat.open .feat__ic{background:var(--accent);border-color:var(--accent);transform:rotate(180deg)}
 .feat.open .feat__ic::after{transform:translate(-50%,-50%) rotate(0deg)}
 .feat__body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ease)}
 .feat.open .feat__body{grid-template-rows:1fr}
 .feat__inner{overflow:hidden}
-.feat__inner > div{padding:0 22px 20px 54px;opacity:0;transform:translateY(-6px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
+.feat__inner > div{padding:0 0 22px 34px;opacity:0;transform:translateY(-6px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
 .feat.open .feat__inner > div{opacity:1;transform:none;transition-delay:.12s}
-.feat__inner p{color:var(--text-2);font-size:15.5px;max-width:38ch}
-.swatches{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
-.swatch{display:flex;align-items:center;gap:9px;padding:6px 14px 6px 6px;border-radius:999px;border:1px solid var(--line);font-size:14px;color:var(--text-2);transition:border-color .3s var(--ease),color .3s var(--ease)}
-.swatch i{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.35),inset 0 -2px 4px rgba(0,0,0,.4)}
+.feat__inner p{color:var(--text-3);font-size:14.5px;line-height:1.6;max-width:36ch}
+.swatches{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.swatch{display:flex;align-items:center;gap:9px;padding:5px 12px 5px 5px;border-radius:999px;border:1px solid var(--line);font-size:13px;color:var(--text-2);transition:border-color .3s var(--ease),color .3s var(--ease)}
+.swatch i{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.35),inset 0 -2px 4px rgba(0,0,0,.4)}
 .swatch[aria-pressed="true"]{border-color:var(--glow);color:var(--text)}
 .chiprow{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .chiprow span{font-size:13px;font-weight:600;color:var(--text);padding:6px 12px;border-radius:999px;background:rgba(107,155,255,.12);border:1px solid rgba(107,155,255,.28)}
@@ -381,8 +381,8 @@ section{position:relative}
   .explode__head{display:none}
   .step h3{font-size:22px;margin:10px 0 8px}
   .step > p{font-size:15px}
-  .stat{margin-top:14px;padding:12px 14px}
-  .stat b{font-size:22px}
+  .stat{margin-top:16px;padding-top:14px;gap:6px}
+  .stat b{font-size:28px}
   .stat span{font-size:13px}
   .tag.is-active span{display:inline-block}
   .materials{height:calc(100vh + 4 * 76vh)}
@@ -395,7 +395,7 @@ section{position:relative}
   .experience .sticky{grid-template-columns:1fr;gap:36px;padding:90px var(--gutter)}
   .exp__frame{width:100%}
   .exp__copy{grid-column:1}
-  .feat{max-width:none;width:100%}
+  .feats{max-width:none}
   .details__col{padding-top:44px;background:linear-gradient(180deg,rgba(6,6,8,0),rgba(6,6,8,.94) 90px)}
   .dial{width:100px;height:100px}
   .exp__row{grid-template-columns:1fr;justify-items:start;gap:44px;margin-top:32px}
@@ -457,8 +457,8 @@ section{position:relative}
   <!-- 1 · HERO -->
   <section class="hero" id="topo" aria-labelledby="hero-title">
     <picture class="hero__media" aria-hidden="true">
-      <source media="(max-width: 720px), (orientation: portrait) and (max-width: 1024px)" srcset="assets/img/hero-watch-m.webp">
-      <img src="assets/img/hero-watch.webp" alt="" width="2400" height="1350" fetchpriority="high" decoding="async">
+      <source media="(max-width: 720px), (orientation: portrait) and (max-width: 1024px)" srcset="assets/img/hero-side-m.webp">
+      <img src="assets/img/hero-side.webp" alt="" width="2400" height="1350" fetchpriority="high" decoding="async">
     </picture>
     <div class="hero__inner">
       <h1 id="hero-title" class="rise" data-i18n="heroTitle">Além do tempo.</h1>
@@ -565,10 +565,9 @@ section{position:relative}
   <section class="details" id="detalhes" aria-labelledby="det-title">
     <div class="sticky">
       <div class="details__col">
-        <p class="kicker" data-i18n="detKicker">Detalhes que contam</p>
         <h2 id="det-title" data-i18n="detTitle">Feito de pequenas decisões.</h2>
         <div class="feats" id="feats">
-          <div class="feat glass open" data-focus="finish">
+          <div class="feat open" data-focus="finish">
             <button class="feat__btn" type="button" aria-expanded="true" aria-controls="fd-1" id="fb-1"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f1">Acabamentos</span></button>
             <div class="feat__body" id="fd-1" role="region" aria-labelledby="fb-1"><div class="feat__inner"><div>
               <p data-i18n="f1p">Três acabamentos para a mesma caixa. <strong>A cor muda, a construção continua idêntica.</strong></p>
@@ -579,38 +578,38 @@ section{position:relative}
               </div>
             </div></div></div>
           </div>
-          <div class="feat glass" data-focus="size">
+          <div class="feat" data-focus="size">
             <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-2" id="fb-2"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f2">Dois tamanhos</span></button>
             <div class="feat__body" id="fd-2" role="region" aria-labelledby="fb-2"><div class="feat__inner"><div>
               <p data-i18n="f2p">A mesma tela circular e a mesma espessura em duas caixas. <strong>As alças mudam de proporção</strong> para acompanhar pulsos menores.</p>
               <div class="chiprow"><span>40 mm</span><span>44 mm</span></div>
             </div></div></div>
           </div>
-          <div class="feat glass" data-focus="crown">
+          <div class="feat" data-focus="crown">
             <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-3" id="fb-3"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f3">Coroa giratória</span></button>
             <div class="feat__body" id="fd-3" role="region" aria-labelledby="fb-3"><div class="feat__inner"><div>
               <p data-i18n="f3p">Gire para rolar listas e trocar de modo <strong>sem cobrir a tela com o dedo</strong>. O serrilhado fino segura bem mesmo com a mão suada.</p>
             </div></div></div>
           </div>
-          <div class="feat glass" data-focus="button">
+          <div class="feat" data-focus="button">
             <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-4" id="fb-4"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f4">Botão lateral</span></button>
             <div class="feat__body" id="fd-4" role="region" aria-labelledby="fb-4"><div class="feat__inner"><div>
               <p data-i18n="f4p">Logo abaixo da coroa, <strong>um botão que você configura</strong>: iniciar um treino, abrir a carteira ou acender a lanterna.</p>
             </div></div></div>
           </div>
-          <div class="feat glass" data-focus="durable">
+          <div class="feat" data-focus="durable">
             <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-5" id="fb-5"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f5">Resistência</span></button>
             <div class="feat__body" id="fd-5" role="region" aria-labelledby="fb-5"><div class="feat__inner"><div>
               <p data-i18n="f5p">Safira na frente, cerâmica atrás e titânio no meio. <strong>A meta de projeto inclui chuva, piscina e suor</strong> do dia a dia.</p>
             </div></div></div>
           </div>
-          <div class="feat glass" data-focus="charge">
+          <div class="feat" data-focus="charge">
             <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-6" id="fb-6"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f6">Carregamento sem fio</span></button>
             <div class="feat__body" id="fd-6" role="region" aria-labelledby="fb-6"><div class="feat__inner"><div>
               <p data-i18n="f6p">Uma bobina na tampa traseira recarrega o relógio na base magnética. <strong>Sem conectores expostos</strong> para juntar sujeira.</p>
             </div></div></div>
           </div>
-          <div class="feat glass" data-focus="strap">
+          <div class="feat" data-focus="strap">
             <button class="feat__btn" type="button" aria-expanded="false" aria-controls="fd-7" id="fb-7"><span class="feat__ic" aria-hidden="true"></span><span data-i18n="f7">Pulseira</span></button>
             <div class="feat__body" id="fd-7" role="region" aria-labelledby="fb-7"><div class="feat__inner"><div>
               <p data-i18n="f7p">Fluoroelastômero macio, com canais que <strong>deixam o pulso respirar</strong>, e um fecho de titânio que quase não pesa.</p>
@@ -784,6 +783,6 @@ section{position:relative}
 
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-<script type="module" src="assets/js/app.js?v=13"></script>
+<script type="module" src="assets/js/app.js?v=14"></script>
 </body>
 </html>

@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=13';
-import { EN, RUNTIME } from './i18n.js?v=13';
+import { drawFace } from './face.js?v=14';
+import { EN, RUNTIME } from './i18n.js?v=14';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -307,7 +307,7 @@ function buildPoses(mob) {
   // experiência espelhada: relógio à esquerda, texto à direita
   const exp = M({ rx: -8, ry: -22, el: -3, dist: 8.0, ty: 0.1, shiftX: -0.22, spin: 0, glassI: 0.45 }, { shiftX: 0, shiftY: 0.22, fitA: 1.25 });
   // detalhes: relógio à direita, quase de frente, para os focos de cada item
-  const det = M({ rx: -10, ry: -30, el: 2, dist: 7.6, ty: 0.05, shiftX: 0.2, spin: 0, glassI: 0.18, bgMix: 1 }, { shiftX: 0, shiftY: 0.3, fitA: 1.4 });
+  const det = M({ rx: -10, ry: -30, el: 2, dist: 9.4, ty: 0.05, shiftX: 0.2, spin: 0, glassI: 0.18, bgMix: 1 }, { shiftX: 0, shiftY: 0.3, fitA: 1.4 });
   // especificações: close do processador aceso, visto por dentro do vidro
   const chipA = M({ set: 1, tx: 0, ty: 0, tz: 0, el: 52, az: -16, dist: 5.4, fitA: 1.5, spin: 0, rim: 1 }, { fitA: 0.75, dist: 6.2 });
   const chipB = M({ set: 1, tx: 0, ty: 0, tz: 0, el: 46, az: 14, dist: 4.7, fitA: 1.5, spin: 0, rim: 1 }, { fitA: 0.75, dist: 5.6 });
@@ -558,7 +558,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=13'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=14'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
