@@ -151,19 +151,16 @@ section{position:relative}
 /* ---------- 3/4 desmontagem: card de vidro por camada + coluna de peças ---------- */
 .explode{height:calc(100vh + 6 * 95vh)}
 .explode .sticky{display:grid;grid-template-columns:minmax(340px,32vw) 1fr minmax(260px,20vw);align-items:center;gap:20px;padding:var(--nav-h) var(--gutter) 0}
-.explode__panel{align-self:center;min-width:0;max-width:400px;padding:0;text-shadow:0 2px 24px rgba(4,6,12,.9)}
-.explode__head{margin-bottom:clamp(40px,7vh,72px)}
+.box{background:linear-gradient(180deg,rgba(11,14,22,.92),rgba(7,9,15,.92));border:1px solid rgba(255,255,255,.06);border-radius:28px;box-shadow:0 30px 80px -30px rgba(0,0,0,.8);padding:clamp(40px,3.6vw,60px)}
+.explode__panel{align-self:center;min-width:0;max-width:460px}
 .steps{display:grid}
 .step{grid-area:1/1;opacity:0;transform:translateY(14px);filter:blur(4px);transition:opacity .55s var(--ease),transform .55s var(--ease),filter .55s var(--ease);pointer-events:none}
 .step.is-active{opacity:1;transform:none;filter:none;pointer-events:auto}
-.step__n{display:flex;align-items:center;gap:12px;margin:0 0 22px;font:500 13px/1 var(--display);letter-spacing:.12em;color:var(--text)}
-.step__n i{width:44px;height:1px;background:linear-gradient(90deg,var(--glow),rgba(145,160,186,.25))}
-.step__n span{color:var(--text-3)}
 .step .eyebrow{margin:0}
-.step h3{font-size:clamp(30px,2.6vw,42px);font-weight:500;letter-spacing:-.03em;line-height:1.08;margin:14px 0 18px;max-width:14ch}
-.step > p:not(.step__n,.eyebrow){color:var(--text-3);max-width:34ch;font-size:15.5px;line-height:1.65;margin:0}
+.step h3{font-size:clamp(28px,2.3vw,38px);font-weight:500;letter-spacing:-.03em;line-height:1.1;margin:16px 0 18px;max-width:14ch}
+.step > p:not(.eyebrow){color:var(--text-3);max-width:34ch;font-size:15.5px;line-height:1.65;margin:0}
 .step > p strong{color:var(--text-2);font-weight:500}
-.stat{display:flex;align-items:baseline;gap:14px;margin-top:clamp(36px,6vh,56px)}
+.stat{display:flex;align-items:baseline;gap:14px;margin-top:clamp(32px,5vh,48px)}
 .stat b{font:400 clamp(30px,2.4vw,38px)/1 var(--display);letter-spacing:-.03em;white-space:nowrap;color:var(--text)}
 .stat span{font-size:13px;line-height:1.45;color:var(--text-3);max-width:22ch}
 .gauge{--slot:118px;grid-column:3;list-style:none;position:relative;justify-self:end;width:100%;height:calc(var(--slot) * 3.4);margin:0;padding:0;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 26%,#000 74%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 26%,#000 74%,transparent 100%)}
@@ -202,10 +199,11 @@ section{position:relative}
 /* ---------- 7 detalhes: um item aberto por vez ---------- */
 .details{height:180vh}
 .details .sticky{display:grid;grid-template-columns:minmax(330px,34vw) 1fr;align-items:center;padding:var(--nav-h) var(--gutter) 0}
-.details__col{min-width:0}
-.details__col h2{font-size:clamp(28px,2.6vw,40px);font-weight:500;max-width:14ch;margin:0 0 clamp(28px,4vh,44px)}
-.feats{display:flex;flex-direction:column;max-width:340px;border-top:1px solid var(--line)}
+.details__col{min-width:0;justify-self:start;width:min(100%,500px)}
+.details__col h2{font-size:clamp(28px,2.4vw,38px);font-weight:500;max-width:18ch;margin:0 0 clamp(28px,4vh,44px)}
+.feats{display:flex;flex-direction:column;border-top:1px solid var(--line)}
 .feat{border-bottom:1px solid var(--line)}
+.feat:last-child{border-bottom:0}
 .feat__btn{display:flex;align-items:center;gap:14px;width:100%;padding:12px 0;text-align:left;font-size:14.5px;font-weight:500;color:var(--text-2);transition:color .35s var(--ease)}
 .feat.open .feat__btn,.feat__btn:hover{color:var(--text)}
 .feat__ic{position:relative;flex:none;width:20px;height:20px;border-radius:50%;border:1px solid rgba(243,246,252,.45);transition:transform .45s var(--ease),background .45s var(--ease),border-color .45s var(--ease)}
@@ -382,11 +380,10 @@ section{position:relative}
   .intro .sticky{padding-top:calc(var(--nav-h) + 3vh)}
   .explode{height:calc(100vh + 6 * 80vh)}
   .explode .sticky{align-items:end;padding:0 12px 12px}
-  .explode__panel{align-self:end;max-width:none;padding:22px 6px 10px;background:linear-gradient(180deg,rgba(4,6,12,0),rgba(4,6,12,.92) 40px)}
-  .explode__head{display:none}
+  .explode__panel{align-self:end;max-width:none}
+  .box{padding:24px 22px;border-radius:22px}
   .step h3{font-size:22px;margin:10px 0 8px}
-  .step > p:not(.step__n,.eyebrow){font-size:15px}
-  .step__n{margin-bottom:12px}
+  .step > p:not(.eyebrow){font-size:15px}
   .stat{margin-top:18px}
   .stat b{font-size:26px}
   .stat span{font-size:13px}
@@ -402,7 +399,7 @@ section{position:relative}
   .exp__frame{width:100%}
   .exp__copy{grid-column:1}
   .feats{max-width:none}
-  .details__col{padding-top:44px;background:linear-gradient(180deg,rgba(6,6,8,0),rgba(6,6,8,.94) 90px)}
+  .details__col{width:100%}
   .dial{width:100px;height:100px}
   .exp__row{grid-template-columns:1fr;justify-items:start;gap:44px;margin-top:32px}
   .exp__row .modes{width:100%}
@@ -462,8 +459,8 @@ section{position:relative}
   <!-- 1 · HERO -->
   <section class="hero" id="topo" aria-labelledby="hero-title">
     <picture class="hero__media" aria-hidden="true">
-      <source media="(max-width: 720px), (orientation: portrait) and (max-width: 1024px)" srcset="assets/img/hero-side2-m.webp">
-      <img src="assets/img/hero-side2.webp" alt="" width="2400" height="1350" fetchpriority="high" decoding="async">
+      <source media="(max-width: 720px), (orientation: portrait) and (max-width: 1024px)" srcset="assets/img/hero-v-m.webp">
+      <img src="assets/img/hero-v.webp" alt="" width="2400" height="1350" fetchpriority="high" decoding="async">
     </picture>
     <div class="hero__inner">
       <h1 id="hero-title" class="rise" data-i18n="heroTitle">Além do tempo.</h1>
@@ -487,46 +484,40 @@ section{position:relative}
   <!-- 3 e 4 · DESMONTAGEM + COMPONENTES -->
   <section class="explode" id="desmontagem" aria-labelledby="explode-title">
     <div class="sticky">
-      <div class="explode__panel">
-        <div class="explode__head"><p class="kicker" id="explode-title" data-i18n="explodeKicker">Seis camadas, uma intenção</p></div>
+      <div class="explode__panel box">
+        <p class="sr-only" id="explode-title" data-i18n="explodeKicker">Seis camadas, uma intenção</p>
         <div class="steps">
           <article class="step" data-step="0">
-            <p class="step__n" aria-hidden="true">01<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p1">Vidro de safira</p>
             <h3 data-i18n="s1t">Feito para durar.</h3>
             <p data-i18n="s1p">A camada que você toca. Safira, escolhida na relojoaria por <strong>resistir bem a riscos</strong>.</p>
             <div class="stat"><b>9</b><span data-i18n="s1s">na escala de Mohs, a dureza da safira</span></div>
           </article>
           <article class="step" data-step="1">
-            <p class="step__n" aria-hidden="true">02<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p2">Moldura de titânio</p>
             <h3 data-i18n="s2t">Leve e firme.</h3>
             <p data-i18n="s2p">Prende o vidro e desenha o contorno. Titânio pela relação entre <strong>leveza e rigidez</strong>.</p>
             <div class="stat"><b data-i18n="s2v">Grau 5</b><span data-i18n="s2s">titânio proposto para caixa e moldura</span></div>
           </article>
           <article class="step" data-step="2">
-            <p class="step__n" aria-hidden="true">03<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p3">Tela AMOLED</p>
             <h3 data-i18n="s3t">Luz só onde precisa.</h3>
             <p data-i18n="s3p">Cada pixel acende sozinho, então <strong>o preto é preto de verdade</strong> e a tela só gasta com o que aparece.</p>
             <div class="stat"><b>466 × 466</b><span data-i18n="s3s">pixels em 1,43 polegada, na proposta</span></div>
           </article>
           <article class="step" data-step="3">
-            <p class="step__n" aria-hidden="true">04<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p4">Placa principal</p>
             <h3 data-i18n="s4t">Tudo em pouco espaço.</h3>
             <p data-i18n="s4p">Processador, memória e rádios em uma placa compacta, que <strong>libera espaço para a bateria</strong>.</p>
             <div class="stat"><b data-i18n="s4v">4 rádios</b><span data-i18n="s4s">Bluetooth, Wi-Fi, NFC e GPS na mesma placa</span></div>
           </article>
           <article class="step" data-step="4">
-            <p class="step__n" aria-hidden="true">05<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p5">Sensores ópticos</p>
             <h3 data-i18n="s5t">Lê o pulso pela luz.</h3>
             <p data-i18n="s5p">LEDs e fotodiodos <strong>leem variações de luz na pele</strong>. Conceito de bem-estar, não dispositivo médico.</p>
             <div class="stat"><b>4 + 4</b><span data-i18n="s5s">LEDs e fotodiodos sob uma janela de safira</span></div>
           </article>
           <article class="step" data-step="5">
-            <p class="step__n" aria-hidden="true">06<i></i><span>06</span></p>
             <p class="eyebrow" data-i18n="p6">Bateria</p>
             <h3 data-i18n="s6t">Energia bem dividida.</h3>
             <p data-i18n="s6p">O maior volume interno. Tela, processador e sensores pensados para <strong>consumir pouco juntos</strong>.</p>
@@ -575,7 +566,7 @@ section{position:relative}
   <!-- 7 · DETALHES -->
   <section class="details" id="detalhes" aria-labelledby="det-title">
     <div class="sticky">
-      <div class="details__col">
+      <div class="details__col box">
         <h2 id="det-title" data-i18n="detTitle">Feito de pequenas decisões.</h2>
         <div class="feats" id="feats">
           <div class="feat open" data-focus="finish">
@@ -772,6 +763,6 @@ section{position:relative}
 
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-<script type="module" src="assets/js/app.js?v=15"></script>
+<script type="module" src="assets/js/app.js?v=16"></script>
 </body>
 </html>
