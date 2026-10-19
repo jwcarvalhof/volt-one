@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=18';
-import { EN, RUNTIME } from './i18n.js?v=18';
+import { drawFace } from './face.js?v=19';
+import { EN, RUNTIME } from './i18n.js?v=19';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -289,11 +289,12 @@ const STEP_PART = [0, 1, 2, 3, 5, 4]; // etapa -> peça (sensores ficam na tampa
 const EX = (n, v = 1) => { const o = { e0: 0, e1: 0, e2: 0, e3: 0, e4: 0, e5: 0 }; for (let i = 0; i < n; i++) o['e' + STEP_PART[i]] = v; return o; };
 function buildPoses(mob) {
   const M = (d, m) => Object.assign({}, DEF, d, mob ? (m || {}) : {});
-  const stepBase = { rx: -54, ry: -22, el: 10, shiftX: 0.03, strap: 1, tags: 1, fitA: 0.95, tx: 0, ty: 0 };
+  const stepBase = { rx: -54, ry: -22, el: 10, shiftX: 0.03, strap: 0, tags: 1, fitA: 0.95, tx: 0, ty: 0 };
   const stepMob = { shiftX: 0, shiftY: 0.22, fitA: 0.86 };
   const frames = [
-    { tz: 0.2, dist: 7.0, tags: 0 }, { tz: 1.5, dist: 9.4 }, { tz: 1.35, dist: 9.8 }, { tz: 1.2, dist: 10.2 },
-    { tz: 1.05, dist: 10.6 }, { tz: 0.35, dist: 10.6, el: -62, beam: 1 }, { tz: 0.95, dist: 11.0, bglow: 1, beam: 0.5 }
+    // câmera parada: só as peças se separam, sem a cena balançar a cada etapa
+    { tz: 1.0, dist: 10.4, tags: 0 }, { tz: 1.0, dist: 10.4 }, { tz: 1.0, dist: 10.4 }, { tz: 1.0, dist: 10.4 },
+    { tz: 1.0, dist: 10.4 }, { tz: 1.0, dist: 10.4 }, { tz: 1.0, dist: 10.4, bglow: 1 }
   ];
   const stepsP = frames.map((f, n) => M({ ...stepBase, ...EX(n), ...f }, stepMob));
   const mBase = { ...EX(6), rx: -54, ry: -22, strap: 1, tags: 0, shiftX: 0.14, fitA: 1.0 };
@@ -323,7 +324,7 @@ function buildPoses(mob) {
       [mp(m4a), mp({ ...m4a, dist: 2.85, az: -6 })]
     ],
     rA: M({ ...stepBase, ...EX(6), tz: 0.95, dist: 11.0, tags: 0, beam: 0.3 }, stepMob),
-    rMid: M({ ...EX(6, 0.3), rx: -36, ry: -26, el: 8, dist: 9.2, tz: 0.4, ty: 0, strap: 0.7, rim: 3.2, fitA: 1.0, shiftY: -0.2 }, { shiftY: -0.12, fitA: 0.8 }),
+    rMid: M({ ...EX(6, 0.3), rx: -36, ry: -26, el: 8, dist: 9.2, tz: 0.4, ty: 0, strap: 0, rim: 3.2, fitA: 1.0, shiftY: -0.2 }, { shiftY: -0.12, fitA: 0.8 }),
     rEnd: M({ rx: -12, ry: -34, el: 2, dist: 8.4, shiftY: -0.2, ty: 0.1, spin: 0 }, { shiftY: -0.14, fitA: 1.15 }),
     det, exp, expHidden: { ...exp, vis: 0 },
     chipA, chipB, chipAHidden: { ...chipA, vis: 0 }, chipBHidden: { ...chipB, vis: 0 },
@@ -341,7 +342,7 @@ function introPose() {
   const e = intro.k, r = 1 - e;
   return { ...S, rz: S.rz + r * 150, ry: S.ry - r * 70, rx: S.rx + r * 35, dist: S.dist + r * 3.2, vis: S.vis * Math.min(1, e * 3) };
 }
-let three = null, running = false, rafOn = false, master = null, masterST = null;
+let three = null, running = false, rafOn = false, master = null, masterST = null, passes = [];
 if (stillDebug) window.__volt = { S, get L() { return L; }, get tl() { return master; } };
 let canvas = $('#gl');
 const par = { x: 0, y: 0 }, parT = { x: 0, y: 0 };
@@ -390,27 +391,35 @@ function buildMaster() {
   const vh = L.vh, I = L.intro, E = L.explode, Mt = L.mat, R = L.rebuild, D = L.det, X = L.exp, Sp = L.specs, C = L.close;
   const K = [];
   const add = (y, pose, ease) => K.push([y, pose, ease]);
-  // o topo mostra o relógio 3D deitado, com a coroa para a frente
+  // cada seção tem o seu relógio: ele rola junto com a seção e some na metade da passagem,
+  // e o da seção seguinte entra subindo, já na pose dela (nada atravessa de uma seção para outra)
+  const H = o => ({ ...o, vis: 0, tags: 0 });
+  const T = [];
+  const pass = (a, b, from, to) => { const m = (a + b) / 2; T.push([a, b]); add(m - 1, H(from)); add(m, H(to)); add(b, to); };
+  const end = s => s.top + s.r;
   add(0, P.hero);
-  add(Math.max(1, I.top - vh * 0.75), P.hero);
-  add(I.top + 0.45 * I.r, P.approach);
-  add(I.top + I.r, P.steps[0]);
+  pass(0, I.top, P.hero, P.approach);
+  add(end(I), P.approach);
+  pass(end(I), E.top, P.approach, P.steps[0]);
   for (let i = 0; i < 6; i++) {
-    add(E.top + i * L.stepLen, P.steps[i]);
-    add(E.top + i * L.stepLen + 0.62 * L.stepLen, P.steps[i + 1], 'power1.inOut');
+    add(E.top + i * L.stepLen + 0.2 * L.stepLen, P.steps[i]);
+    add(E.top + i * L.stepLen + 0.7 * L.stepLen, P.steps[i + 1], 'power1.inOut');
   }
-  add(E.top + E.r, P.steps[6]);
+  add(end(E), P.steps[6]);
+  pass(end(E), Mt.top, P.steps[6], P.mats[0][0]);
   for (let i = 0; i < 4; i++) {
     add(Mt.top + (i + 0.28) * L.matLen, P.mats[i][0], 'power2.inOut');
     add(Mt.top + (i + 0.86) * L.matLen, P.mats[i][1], 'sine.inOut');
   }
-  add(R.top + 0.1 * R.r, P.rA, 'power2.inOut');
+  add(end(Mt), P.mats[3][1]);
+  pass(end(Mt), R.top, P.mats[3][1], P.rA);
   add(R.top + 0.5 * R.r, P.rMid, 'power2.in');
   add(R.top + 0.94 * R.r, P.rEnd, 'power2.out');
-  add(D.top - vh * 0.15, P.det, 'power2.inOut');
-  add(D.top + D.r, P.det);
-  // a experiência agora é uma foto renderizada: o 3D apaga ao sair dos detalhes
-  add(X.top - vh * 0.55, P.expHidden, 'power1.in');
+  add(end(R), P.rEnd);
+  pass(end(R), D.top, P.rEnd, P.det);
+  add(end(D), P.det);
+  { const a = end(D), b = Math.max(a + 2, X.top); T.push([a, (a + b) / 2 * 2 - a]); add((a + b) / 2, H(P.det)); add((a + b) / 2 + 1, P.expHidden); }
+  passes = T;
   // troca de cena por um apagar e acender, sem a câmera atravessar o espaço
   // o relógio da experiência apaga antes da seção de recursos (fotos); o chip só acende nas especificações
   const F = L.feats;
@@ -441,6 +450,18 @@ function buildMaster() {
   invalidate();
 }
 
+// desloca o palco 3D junto com a rolagem nas passagens entre seções
+let lastShift = null;
+function passShift() {
+  if (!master || !L) return;
+  const y = master.progress() * L.max;
+  let off = 0;
+  for (const [a, b] of passes) {
+    if (y > a && y < b) { const m = (a + b) / 2; off = y < m ? -(y - a) : (b - y); break; }
+  }
+  off = Math.round(off);
+  if (off !== lastShift) { lastShift = off; glWrap.style.transform = off ? `translate3d(0,${off}px,0)` : ''; }
+}
 function invalidate() {
   if (!running || rafOn) return;
   rafOn = true; requestAnimationFrame(loop);
@@ -454,6 +475,7 @@ function loop(t) {
   const k = 1 - Math.pow(1 - 0.08, Math.min(100, dt) / 16.667);
   par.x += (parT.x - par.x) * k; par.y += (parT.y - par.y) * k;
   const RS = introPose();
+  passShift();
   const op = Math.round(clamp(RS.vis) * 1000) / 1000;
   if (op !== lastCanvasOp) { lastCanvasOp = op; glWrap.style.opacity = op; }
   const visible = op > 0.003;
@@ -568,7 +590,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=18'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=19'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
@@ -635,13 +657,11 @@ function focusTo(key) {
 }
 function openFeat(el) {
   feats.forEach(f => {
-    const on = f === el && !f.classList.contains('open');
-    const keep = f === el && f.classList.contains('open');
-    const open = on || keep;
+    const open = f === el && !f.classList.contains('open');
     f.classList.toggle('open', open);
     f.querySelector('.feat__btn').setAttribute('aria-expanded', String(open));
   });
-  curFocus = el.dataset.focus;
+  curFocus = el.classList.contains('open') ? el.dataset.focus : 'finish';
   focusTo(curFocus);
 }
 feats.forEach(f => f.querySelector('.feat__btn').addEventListener('click', () => openFeat(f)));
