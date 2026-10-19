@@ -137,6 +137,7 @@ section{position:relative}
 .hero .lede{max-width:40ch;margin-inline:auto;font-size:clamp(15px,1.15vw,17px)}
 .cta-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:26px}
 .hero .rise{opacity:0;transform:translateY(22px);animation:rise 1.1s var(--ease) forwards}
+.hero .rise{animation-play-state:paused}.hero-in .hero .rise{animation-play-state:running}
 .hero .rise:nth-child(2){animation-delay:.12s}.hero .rise:nth-child(3){animation-delay:.24s}
 .hero > .cta-row{margin-top:0;animation-delay:1.2s}
 @keyframes rise{to{opacity:1;transform:none}}
@@ -449,7 +450,7 @@ section{position:relative}
   </a>
   <nav class="nav__links" data-i18n-aria="navAria" aria-label="Principal">
     <a href="#detalhes" data-i18n="navExplore">Explorar</a>
-    <a href="#desmontagem" data-i18n="navEng">Engenharia</a>
+    <a href="#materiais" data-i18n="navEng">Engenharia</a>
     <a href="#especificacoes" data-i18n="navSpecs">Especificações</a>
   </nav>
   <div class="nav__end">
@@ -487,60 +488,6 @@ section{position:relative}
     </div>
   </section>
 
-  <!-- 3 e 4 · DESMONTAGEM + COMPONENTES -->
-  <section class="explode framed" id="desmontagem" aria-labelledby="explode-title">
-    <div class="sticky">
-      <div class="explode__panel">
-        <p class="sr-only" id="explode-title" data-i18n="explodeKicker">Seis camadas, uma intenção</p>
-        <div class="steps">
-          <article class="step" data-step="0">
-            <p class="eyebrow" data-i18n="p1">Vidro de safira</p>
-            <h3 data-i18n="s1t">Feito para durar.</h3>
-            <p data-i18n="s1p">A camada que você toca. Safira, escolhida na relojoaria por <strong>resistir bem a riscos</strong>.</p>
-            <div class="stat"><b>9</b><span data-i18n="s1s">na escala de Mohs, a dureza da safira</span></div>
-          </article>
-          <article class="step" data-step="1">
-            <p class="eyebrow" data-i18n="p2">Moldura de titânio</p>
-            <h3 data-i18n="s2t">Leve e firme.</h3>
-            <p data-i18n="s2p">Prende o vidro e desenha o contorno. Titânio pela relação entre <strong>leveza e rigidez</strong>.</p>
-            <div class="stat"><b data-i18n="s2v">Grau 5</b><span data-i18n="s2s">titânio proposto para caixa e moldura</span></div>
-          </article>
-          <article class="step" data-step="2">
-            <p class="eyebrow" data-i18n="p3">Tela AMOLED</p>
-            <h3 data-i18n="s3t">Luz só onde precisa.</h3>
-            <p data-i18n="s3p">Cada pixel acende sozinho, então <strong>o preto é preto de verdade</strong> e a tela só gasta com o que aparece.</p>
-            <div class="stat"><b>466 × 466</b><span data-i18n="s3s">pixels em 1,43 polegada, na proposta</span></div>
-          </article>
-          <article class="step" data-step="3">
-            <p class="eyebrow" data-i18n="p4">Placa principal</p>
-            <h3 data-i18n="s4t">Tudo em pouco espaço.</h3>
-            <p data-i18n="s4p">Processador, memória e rádios em uma placa compacta, que <strong>libera espaço para a bateria</strong>.</p>
-            <div class="stat"><b data-i18n="s4v">4 rádios</b><span data-i18n="s4s">Bluetooth, Wi-Fi, NFC e GPS na mesma placa</span></div>
-          </article>
-          <article class="step" data-step="4">
-            <p class="eyebrow" data-i18n="p5">Sensores ópticos</p>
-            <h3 data-i18n="s5t">Lê o pulso pela luz.</h3>
-            <p data-i18n="s5p">LEDs e fotodiodos <strong>leem variações de luz na pele</strong>. Conceito de bem-estar, não dispositivo médico.</p>
-            <div class="stat"><b>4 + 4</b><span data-i18n="s5s">LEDs e fotodiodos sob uma janela de safira</span></div>
-          </article>
-          <article class="step" data-step="5">
-            <p class="eyebrow" data-i18n="p6">Bateria</p>
-            <h3 data-i18n="s6t">Energia bem dividida.</h3>
-            <p data-i18n="s6p">O maior volume interno. Tela, processador e sensores pensados para <strong>consumir pouco juntos</strong>.</p>
-            <div class="stat"><b data-i18n="s6v">Até 3 dias</b><span data-i18n="s6s">meta de autonomia, ainda sem teste</span></div>
-          </article>
-        </div>
-      </div>
-      <ol class="gauge" id="gauge" data-i18n-aria="gaugeAria" aria-label="Ir para uma camada">
-        <li><button type="button" data-go="0"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15"/><path d="M16.5 21.5a8.5 8.5 0 0 1 5-5"/><path d="m20 31 11-11M25.5 32.5l7-7"/></svg><span class="g-name" data-i18n="g1">Vidro de safira</span><span class="g-sub" data-i18n="g1s">Proteção e nitidez</span></button></li>
-        <li><button type="button" data-go="1"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="11"/><path d="M24 9v4M24 35v4M9 24h4M35 24h4"/></svg><span class="g-name" data-i18n="g2">Moldura de titânio</span><span class="g-sub" data-i18n="g2s">Leveza e rigidez</span></button></li>
-        <li><button type="button" data-go="2"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="11"/><path d="M24 17v7l4.5 3"/></svg><span class="g-name" data-i18n="g3">Tela AMOLED</span><span class="g-sub" data-i18n="g3s">Contraste e economia</span></button></li>
-        <li><button type="button" data-go="3"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="15" y="15" width="18" height="18" rx="2.5"/><rect x="20" y="20" width="8" height="8" rx="1"/><path d="M20 10v5M28 10v5M20 33v5M28 33v5M10 20h5M10 28h5M33 20h5M33 28h5"/></svg><span class="g-name" data-i18n="g4">Placa principal</span><span class="g-sub" data-i18n="g4s">Processamento</span></button></li>
-        <li><button type="button" data-go="4"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><path d="M5 24h8l4-10 7 20 5-13 3 3h11"/></svg><span class="g-name" data-i18n="g5">Sensores</span><span class="g-sub" data-i18n="g5s">Leitura óptica no pulso</span></button></li>
-        <li><button type="button" data-go="5"><svg class="g-ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="16" width="30" height="16" rx="4"/><path d="M41 21.5v5"/><path d="m23.5 19.5-4 5h5l-4 5"/></svg><span class="g-name" data-i18n="g6">Bateria</span><span class="g-sub" data-i18n="g6s">Energia</span></button></li>
-      </ol>
-    </div>
-  </section>
 
   <!-- 5 · MATERIAIS -->
   <section class="materials" id="materiais" aria-labelledby="mat-title">
@@ -744,7 +691,7 @@ section{position:relative}
   </a>
   <nav data-i18n-aria="footAria" aria-label="Rodapé">
     <a href="#detalhes" data-i18n="navExplore">Explorar</a>
-    <a href="#desmontagem" data-i18n="navEng">Engenharia</a>
+    <a href="#materiais" data-i18n="navEng">Engenharia</a>
     <a href="#materiais" data-i18n="footMat">Materiais</a>
     <a href="#especificacoes" data-i18n="navSpecs">Especificações</a>
   </nav>
@@ -756,6 +703,6 @@ section{position:relative}
 
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-<script type="module" src="assets/js/app.js?v=19"></script>
+<script type="module" src="assets/js/app.js?v=20"></script>
 </body>
 </html>

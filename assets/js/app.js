@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=19';
-import { EN, RUNTIME } from './i18n.js?v=19';
+import { drawFace } from './face.js?v=20';
+import { EN, RUNTIME } from './i18n.js?v=20';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -39,7 +39,7 @@ let no3d = qs.has('no3d') || (!qs.has('force3d') && webglStatus() !== 'ok');
 /* ---------------- elementos ---------------- */
 const nav = $('#nav');
 const sec = {
-  intro: $('#engenharia'), explode: $('#desmontagem'), mat: $('#materiais'),
+  intro: $('#engenharia'), mat: $('#materiais'),
   rebuild: $('#reconstrucao'), det: $('#detalhes'), exp: $('#experiencia'), feats: $('#recursos'), specs: $('#especificacoes'), family: $('#modelos'), close: $('#encerramento')
 };
 const steps = $$('.step'), gaugeItems = $$('#gauge li'), mats = $$('.mat');
@@ -88,7 +88,6 @@ function measure() {
   const box = el => { const r = el.getBoundingClientRect(); return { top: r.top + scrollY, h: el.offsetHeight }; };
   const o = { vh };
   for (const k in sec) { o[k] = box(sec[k]); o[k].r = Math.max(1, o[k].h - vh); }
-  o.stepLen = o.explode.r / 6;
   o.matLen = o.mat.r / 4;
   o.max = Math.max(1, document.documentElement.scrollHeight - vh);
   L = o;
@@ -123,7 +122,7 @@ document.addEventListener('click', e => {
 $$('#gauge button').forEach(b => b.addEventListener('click', () => {
   measure();
   const i = +b.dataset.go;
-  glideTo(L.explode.top + i * L.stepLen + L.stepLen * 0.7);
+  glideTo(L.mat.top);
 }));
 
 /* ---------------- roda de camadas: a ativa no centro, vizinhas esmaecidas ---------------- */
@@ -161,9 +160,6 @@ function onScrollUI() {
   const y = scrollY;
   nav.classList.toggle('scrolled', y > 30);
   if (!L) measure();
-  const e = L.explode;
-  if (y >= e.top - L.vh && y <= e.top + e.h) setStep(clamp(Math.floor((y - e.top) / L.stepLen), 0, 5));
-  else setStep(-1);
   const m = L.mat;
   if (y >= m.top - L.vh * 0.6 && y <= m.top + m.h) setMat(clamp(Math.floor((y - m.top + L.matLen * 0.1) / L.matLen), 0, 3));
   else setMat(-1);
@@ -335,12 +331,23 @@ function buildPoses(mob) {
 /* ---------------- 3D ---------------- */
 const S = { ...DEF, vis: 0, screen: 1 };
 // giro de entrada da hero: 0 = começando, 1 = pousado
-const intro = { k: 1 };
+const intro = { t0: 0, s: 0 };
+let introScr = 1;
+const lerp = (a, b, k) => a + (b - a) * k;
+const eio = u => u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+function heroIn() { root.classList.add('hero-in'); }
+// chega reto e apagado, com luz baixa; depois gira até ficar de lado e só então o texto aparece
 function introPose() {
-  if (intro.t0) { const u = Math.min(1, Math.max(0, (performance.now() - intro.t0) / 2600)); intro.k = 1 - Math.pow(1 - u, 3); if (u >= 1) intro.t0 = 0; }
-  if (intro.k >= 1) return S;
-  const e = intro.k, r = 1 - e;
-  return { ...S, rz: S.rz + r * 150, ry: S.ry - r * 70, rx: S.rx + r * 35, dist: S.dist + r * 3.2, vis: S.vis * Math.min(1, e * 3) };
+  if (!intro.t0) { introScr = 1; return S; }
+  const s = intro.s, A = 1.3, B = 2.6;
+  if (s >= A + B) { intro.t0 = 0; introScr = 1; heroIn(); return S; }
+  const F = { rx: -6, ry: -12, rz: 0, el: 2, shiftX: 0, shiftY: S.shiftY + 0.04, dist: S.dist + 0.8 };
+  let k, vis, scr, d0;
+  if (s < A) { const u = Math.max(0, s / A); k = 0; vis = 0.45 * (1 - Math.pow(1 - u, 2)); scr = 0; d0 = lerp(S.dist + 3.2, F.dist, 1 - Math.pow(1 - u, 3)); }
+  else { const u = (s - A) / B; k = eio(u); vis = lerp(0.45, 1, k); scr = Math.min(1, u * 1.6); d0 = F.dist; }
+  introScr = scr;
+  return { ...S, rx: lerp(F.rx, S.rx, k), ry: lerp(F.ry, S.ry, k), rz: lerp(F.rz, S.rz, k), el: lerp(F.el, S.el, k),
+    shiftX: lerp(F.shiftX, S.shiftX, k), shiftY: lerp(F.shiftY, S.shiftY, k), dist: lerp(d0, S.dist, k), vis: S.vis * vis };
 }
 let three = null, running = false, rafOn = false, master = null, masterST = null, passes = [];
 if (stillDebug) window.__volt = { S, get L() { return L; }, get tl() { return master; } };
@@ -388,7 +395,7 @@ function buildMaster() {
   if (master) { master.kill(); master = null; }
   measure();
   const P = buildPoses(mqMobile.matches);
-  const vh = L.vh, I = L.intro, E = L.explode, Mt = L.mat, R = L.rebuild, D = L.det, X = L.exp, Sp = L.specs, C = L.close;
+  const vh = L.vh, I = L.intro, Mt = L.mat, R = L.rebuild, D = L.det, X = L.exp, Sp = L.specs, C = L.close;
   const K = [];
   const add = (y, pose, ease) => K.push([y, pose, ease]);
   // cada seção tem o seu relógio: ele rola junto com a seção e some na metade da passagem,
@@ -400,13 +407,7 @@ function buildMaster() {
   add(0, P.hero);
   pass(0, I.top, P.hero, P.approach);
   add(end(I), P.approach);
-  pass(end(I), E.top, P.approach, P.steps[0]);
-  for (let i = 0; i < 6; i++) {
-    add(E.top + i * L.stepLen + 0.2 * L.stepLen, P.steps[i]);
-    add(E.top + i * L.stepLen + 0.7 * L.stepLen, P.steps[i + 1], 'power1.inOut');
-  }
-  add(end(E), P.steps[6]);
-  pass(end(E), Mt.top, P.steps[6], P.mats[0][0]);
+  pass(end(I), Mt.top, P.approach, P.mats[0][0]);
   for (let i = 0; i < 4; i++) {
     add(Mt.top + (i + 0.28) * L.matLen, P.mats[i][0], 'power2.inOut');
     add(Mt.top + (i + 0.86) * L.matLen, P.mats[i][1], 'sine.inOut');
@@ -452,6 +453,7 @@ function buildMaster() {
 
 // desloca o palco 3D junto com a rolagem nas passagens entre seções
 let lastShift = null;
+const ZP = { x: 0, y: 0 };
 function passShift() {
   if (!master || !L) return;
   const y = master.progress() * L.max;
@@ -474,19 +476,21 @@ function loop(t) {
   const dt = lastFrameT ? t - lastFrameT : 16; lastFrameT = t;
   const k = 1 - Math.pow(1 - 0.08, Math.min(100, dt) / 16.667);
   par.x += (parT.x - par.x) * k; par.y += (parT.y - par.y) * k;
+  if (intro.t0) intro.s += Math.min(dt, 34) / 1000; // passo limitado: em aparelho lento a entrada fica mais lenta, nunca pula
   const RS = introPose();
   passShift();
   const op = Math.round(clamp(RS.vis) * 1000) / 1000;
   if (op !== lastCanvasOp) { lastCanvasOp = op; glWrap.style.opacity = op; }
   const visible = op > 0.003;
   const still = mqReduce.matches || stillDebug;
-  const animating = (!still && (S.spin > 0.01 || S.set > 0.5)) || three.isAnimating() || intro.k < 1;
+  const animating = (!still && (S.spin > 0.01 || S.set > 0.5)) || three.isAnimating() || !!intro.t0;
   const parMoving = Math.abs(parT.x - par.x) + Math.abs(parT.y - par.y) > 0.0008;
   if (visible) {
     S.screen = screenFlash * (faceMode === 'noite' ? 0.6 : 1);
     // movimento ocioso a ~30 fps para poupar bateria; rolagem e interação vão a 60
-    if (!(idleSkip && animating && intro.k >= 1 && !parMoving && t - lastScrub > 150)) {
-      three.render(RS, still ? 0 : t, par, fx);
+    if (!(idleSkip && animating && !intro.t0 && !parMoving && t - lastScrub > 150)) {
+      if (RS !== S) RS.screen = S.screen * introScr;
+      three.render(RS, still ? 0 : t, ZP, fx);
       updateOverlay();
       trackPerf(dt);
     }
@@ -590,7 +594,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=19'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=20'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
@@ -607,14 +611,15 @@ async function boot3D() {
   addEventListener('resize', onResize);
   renderCrown();
   if (window.gsap && !mqReduce.matches && !stillDebug && scrollY < innerHeight * 0.5) {
-    intro.k = 0; intro.t0 = performance.now() + 150;
-  }
+    intro.t0 = 1; intro.s = -0.15;
+  } else heroIn();
   invalidate();
   requestAnimationFrame(() => requestAnimationFrame(() => { root.classList.remove('is-3d-loading'); root.classList.add('is-3d-ready'); }));
 }
 
 /* sem WebGL (ou se o contexto cair): versão estática completa, sem aviso nem botão */
 function goStatic() {
+  heroIn();
   no3d = true;
   running = false;
   removeEventListener('pointermove', onPointer);
@@ -675,6 +680,7 @@ new IntersectionObserver(es => es.forEach(en => {
 }), { threshold: 0.45 }).observe(sec.det);
 
 /* início */
+setTimeout(() => { if (!three) heroIn(); }, 9000); // garantia: o texto da hero aparece mesmo se o 3D não subir
 applyLang(lang, true);
 if (no3d) goStatic();
 else (window.requestIdleCallback || (f => setTimeout(f, 60)))(() => init3D(), { timeout: 600 });
@@ -686,7 +692,7 @@ else (window.requestIdleCallback || (f => setTimeout(f, 60)))(() => init3D(), { 
   const root = $('#recursos'); if (!root) return;
   const track = $('#featsTrack'), cards = $$('.fcard', track), dots = $$('#featsDots button');
   const btnPlay = $('#featsPlay'), DUR = 5500;
-  let idx = 0, timer = 0, userPaused = mqReduce.matches, hover = false, inView = false;
+  let idx = 0, timer = 0, userPaused = false, hover = false, inView = false;
   const cardX = i => cards[i].offsetLeft - track.firstElementChild.offsetLeft;
   function mark(i) {
     idx = i;
@@ -722,10 +728,6 @@ else (window.requestIdleCallback || (f => setTimeout(f, 60)))(() => init3D(), { 
   $('#featsNext').addEventListener('click', () => go(idx + 1));
   btnPlay.addEventListener('click', () => setPaused(!userPaused));
   dots.forEach((d, k) => d.addEventListener('click', () => go(k)));
-  root.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { hover = true; schedule(); } });
-  root.addEventListener('pointerleave', () => { hover = false; schedule(); });
-  root.addEventListener('focusin', () => { hover = true; schedule(); });
-  root.addEventListener('focusout', () => { hover = false; schedule(); });
   track.addEventListener('touchstart', () => { if (!userPaused) setPaused(true); }, { passive: true });
   document.addEventListener('visibilitychange', schedule);
   new IntersectionObserver(es => { inView = es[0].isIntersecting; schedule(); }, { threshold: 0.35 }).observe(root);
