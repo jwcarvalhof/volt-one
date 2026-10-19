@@ -58,7 +58,7 @@ export const EN = {
   featsKicker: 'In step with your day', featsTitle: 'Ready for whatever the day asks.',
   featsPause: 'Pause', featsPlay: 'Play', featsPrev: 'Previous', featsNext: 'Next',
   fc1g: 'Water resistance', fc1t: 'Rain, pool and sweat.', fc1p: 'Sealing designed to keep up with the whole day, from rain on the way to a swim workout. A design target, not yet tested.', fc1a: 'Water droplets on a brushed titanium surface',
-  fc2g: 'Heart rate', fc2t: 'Your heart’s rhythm, on your wrist.', fc2p: 'Continuous optical readings through the day and during workouts, so you understand your effort. For wellness, not for medical use.', fc2a: 'An athlete’s torso running at night, with sweat and blue light',
+  fc2g: 'Heart rate', fc2t: 'Your heart’s rhythm, on your wrist.', fc2p: 'Continuous optical readings through the day and during workouts, so you understand your effort. For wellness, not for medical use.', fc2a: 'An athlete running at night wearing the watch, with sweat and blue light',
   fc3g: 'Dual-frequency GPS', fc3t: 'Route, pace and distance, without your phone.', fc3p: 'Record the whole trail right on the watch and see the path you took when you get back.', fc3a: 'A runner on a high mountain trail before sunrise',
   fc4g: 'Wireless charging', fc4t: 'Snap it on and go.', fc4p: 'A magnetic dock with no exposed contacts. Targeting up to 3 days of typical use per charge.', fc4a: 'A round charging dock with a blue ring of light on dark stone',
   fc5g: 'Night mode', fc5t: 'Little light, dark room.', fc5p: 'At night the screen shows only the time and your next alarm, with as little light as possible.', fc5a: 'VOLT One in the dark, with the screen in night mode',
