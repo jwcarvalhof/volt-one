@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=22';
-import { EN, RUNTIME } from './i18n.js?v=22';
+import { drawFace } from './face.js?v=23';
+import { EN, RUNTIME } from './i18n.js?v=23';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -350,7 +350,7 @@ function introPose() {
   return { ...S, rx: lerp(F.rx, S.rx, k), ry: lerp(F.ry, S.ry, k), rz: lerp(F.rz, S.rz, k), el: lerp(F.el, S.el, k),
     shiftX: lerp(F.shiftX, S.shiftX, k), shiftY: lerp(F.shiftY, S.shiftY, k), dist: lerp(d0, S.dist, k), vis: S.vis * vis };
 }
-let three = null, running = false, rafOn = false, master = null, masterST = null, passes = [];
+let three = null, running = false, rafOn = false, master = null, masterST = null, passes = [], frameRange = null;
 if (stillDebug) window.__volt = { S, get L() { return L; }, get tl() { return master; } };
 let canvas = $('#gl');
 const par = { x: 0, y: 0 }, parT = { x: 0, y: 0 };
@@ -410,7 +410,8 @@ function buildMaster() {
   // nesta seção o relógio se desmonta aos poucos, pronto para a seção seguinte
   add(I.top + 0.25 * I.r, P.approach);
   add(end(I), P.introOpen, 'power1.inOut');
-  pass(end(I), Mt.top, P.introOpen, P.mats[0][0]);
+  // o mesmo relógio aberto segue para a seção seguinte, sem sumir
+  add(Mt.top, P.mats[0][0], 'power2.inOut');
   for (let i = 0; i < 4; i++) {
     add(Mt.top + (i + 0.28) * L.matLen, P.mats[i][0], 'power2.inOut');
     add(Mt.top + (i + 0.86) * L.matLen, P.mats[i][1], 'sine.inOut');
@@ -419,10 +420,13 @@ function buildMaster() {
   pass(end(Mt), R.top, P.mats[3][1], P.rA);
   add(R.top + 0.5 * R.r, P.rMid, 'power2.in');
   add(R.top + 0.94 * R.r, P.rEnd, 'power2.out');
-  add(end(R), P.rEnd);
-  pass(end(R), D.top, P.rEnd, P.det);
-  add(end(D), P.det);
-  { const a = end(D), b = Math.max(a + 2, X.top); T.push([a, (a + b) / 2 * 2 - a]); add((a + b) / 2, H(P.det)); add((a + b) / 2 + 1, P.expHidden); }
+  add(end(R) - vh * 0.3, P.rEnd);
+  add(end(R) - 1, H(P.rEnd), 'power1.in');
+  // detalhes: o relógio já está dentro da caixa e entra e sai junto com ela
+  add(end(R), P.det);
+  add(end(D) + vh, P.det);
+  add(end(D) + vh + 1, P.expHidden);
+  frameRange = [end(R), D.top, end(D), end(D) + vh];
   passes = T;
   // troca de cena por um apagar e acender, sem a câmera atravessar o espaço
   // o relógio da experiência apaga antes da seção de recursos (fotos); o chip só acende nas especificações
@@ -455,6 +459,22 @@ function buildMaster() {
 }
 
 // desloca o palco 3D junto com a rolagem nas passagens entre seções
+let lastFrame = '';
+// na seção de detalhes o palco 3D fica recortado na caixa preta e rola junto com ela na entrada e na saída
+function frameShift() {
+  let tf = '', cp = '';
+  if (master && L && frameRange) {
+    const y = master.progress() * L.max, [a, b, c, d] = frameRange;
+    if (y >= a && y <= d) {
+      const off = Math.round(y < b ? b - y : y > c ? -(y - c) : 0);
+      if (off) tf = `translate3d(0,${off}px,0)`;
+      const st = sec.det.querySelector('.sticky'), cs = getComputedStyle(st, '::before');
+      if (!mqMobile.matches) cp = `inset(${cs.top} ${cs.right} ${cs.bottom} ${cs.left} round ${cs.borderTopLeftRadius})`;
+    }
+  }
+  const k = tf + '|' + cp;
+  if (k !== lastFrame) { lastFrame = k; glWrap.style.transform = tf; glWrap.style.clipPath = cp; }
+}
 let lastShift = null;
 const ZP = { x: 0, y: 0 };
 function passShift() {
@@ -481,6 +501,7 @@ function loop(t) {
   par.x += (parT.x - par.x) * k; par.y += (parT.y - par.y) * k;
   if (intro.t0) intro.s += Math.min(dt, 34) / 1000; // passo limitado: em aparelho lento a entrada fica mais lenta, nunca pula
   const RS = introPose();
+  frameShift();
   const op = Math.round(clamp(RS.vis) * 1000) / 1000;
   if (op !== lastCanvasOp) { lastCanvasOp = op; glWrap.style.opacity = op; }
   const visible = op > 0.003;
@@ -596,7 +617,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=22'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=23'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
