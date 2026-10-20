@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=34';
-import { EN, RUNTIME } from './i18n.js?v=34';
+import { drawFace } from './face.js?v=36';
+import { EN, RUNTIME } from './i18n.js?v=36';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -338,7 +338,7 @@ const lerp = (a, b, k) => a + (b - a) * k;
 const eio = u => -(Math.cos(Math.PI * u) - 1) / 2; // seno: começa e termina macio
 function heroIn() { root.classList.add('hero-in'); }
 // chega reto e apagado, com luz baixa; depois gira até ficar de lado e só então o texto aparece
-function introPose() {
+function introPose(S) {
   if (!intro.t0) { introScr = 1; return S; }
   const s = intro.s, A = 0.4, B = 1.6;
   if (s >= A + B) { intro.t0 = 0; introScr = 1; heroIn(); return S; }
@@ -350,7 +350,7 @@ function introPose() {
   return { ...S, rx: lerp(F.rx, S.rx, k), ry: lerp(F.ry, S.ry, k), rz: lerp(F.rz, S.rz, k), el: lerp(F.el, S.el, k),
     shiftX: lerp(F.shiftX, S.shiftX, k), shiftY: lerp(F.shiftY, S.shiftY, k), dist: lerp(d0, S.dist, k), vis: S.vis * vis };
 }
-let three = null, running = false, rafOn = false, master = null, masterST = null, passes = [], frameRange = null, heroEnd = 0;
+let three = null, running = false, rafOn = false, master = null, masterST = null, passes = [], frameRange = null, heroEnd = 0, heroPose = null;
 if (stillDebug) window.__volt = { S, get L() { return L; }, get tl() { return master; } };
 let canvas = $('#gl');
 const par = { x: 0, y: 0 }, parT = { x: 0, y: 0 };
@@ -409,7 +409,7 @@ function buildMaster() {
   // o relógio da hero fica preso à hero: sobe com ela e sai da tela junto (sem fade)
   add(Math.max(1, I.top - 2), P.hero);
   add(I.top - 1, H(P.approach));
-  heroEnd = I.top;
+  heroEnd = I.top; heroPose = P.hero;
   // nesta seção o relógio se desmonta aos poucos, pronto para a seção seguinte
   add(I.top + 0.25 * I.r, P.approach);
   add(end(I), P.introOpen, 'power1.inOut');
@@ -433,7 +433,7 @@ function buildMaster() {
   // o relógio da experiência apaga antes da seção de recursos (fotos); o chip só acende nas especificações
   add(L.max, H(P.rEnd));
   K.sort((a, b) => a[0] - b[0]);
-  const tl = gsap.timeline({ paused: true, onUpdate: () => { lastScrub = performance.now(); invalidate(); } });
+  const tl = gsap.timeline({ paused: true, onUpdate: () => { lastScrub = performance.now(); invalidate(true); } });
   for (let i = 0; i < K.length - 1; i++) {
     const [ya, pa] = K[i], [yb, pb, ease] = K[i + 1];
     const d = yb - ya;
@@ -449,7 +449,7 @@ function buildMaster() {
 }
 
 // desloca o palco 3D junto com a rolagem nas passagens entre seções
-let lastFrame = '';
+let lastFrame = '', lastSig = '';
 // na seção de detalhes o palco 3D fica recortado na caixa preta e rola junto com ela na entrada e na saída
 function frameShift() {
   let tf = '', cp = '';
@@ -480,7 +480,8 @@ function passShift() {
   off = Math.round(off);
   if (off !== lastShift) { lastShift = off; glWrap.style.transform = off ? `translate3d(0,${off}px,0)` : ''; }
 }
-function invalidate() {
+function invalidate(keep) {
+  if (keep !== true) lastSig = '';
   if (!running || rafOn) return;
   rafOn = true; requestAnimationFrame(loop);
 }
@@ -493,8 +494,11 @@ function loop(t) {
   const k = 1 - Math.pow(1 - 0.08, Math.min(100, dt) / 16.667);
   par.x += (parT.x - par.x) * k; par.y += (parT.y - par.y) * k;
   if (intro.t0) intro.s += Math.min(dt, 60) / 1000; // passo limitado: em aparelho lento a entrada fica mais lenta, nunca pula
-  const RS = introPose();
+  const inHero = heroEnd && heroPose && scrollY < heroEnd;
+  let RS = introPose(inHero ? { ...S, ...heroPose, vis: 1 } : S);
   frameShift();
+  // a rolagem suavizada atrasa a timeline: depois que a hero saiu da tela, o relógio dela não pode reaparecer
+  if (heroEnd && master && L && scrollY >= heroEnd && master.progress() * L.max < heroEnd) RS = { ...RS, vis: 0 };
   const op = Math.round(clamp(RS.vis) * 1000) / 1000;
   if (op !== lastCanvasOp) { lastCanvasOp = op; glWrap.style.opacity = op; }
   const visible = op > 0.003;
@@ -506,7 +510,9 @@ function loop(t) {
     // movimento ocioso a ~30 fps para poupar bateria; rolagem e interação vão a 60
     if (!(idleSkip && animating && !intro.t0 && !parMoving && t - lastScrub > 150)) {
       if (RS !== S) RS.screen = S.screen * introScr;
-      three.render(RS, still ? 0 : t, ZP, fx);
+      // pose igual à anterior e nada animando: não redesenha (o deslocamento da hero é só CSS)
+      let sig = ''; for (const k in RS) sig += RS[k] + ',';
+      if (sig !== lastSig || animating) { lastSig = sig; three.render(RS, still ? 0 : t, ZP, fx); }
       updateOverlay();
       trackPerf(dt);
     }
@@ -586,10 +592,15 @@ function buildTextScrubs() {
   if (no3d || !window.gsap || mqReduce.matches) return;
   const words = $$('.intro h2 .w');
   const sub = $('[data-intro-sub]');
-  const t1 = gsap.timeline({ scrollTrigger: { trigger: sec.intro, start: 'top 75%', end: 'bottom bottom', scrub: 0.6 } });
-  t1.fromTo(words, { yPercent: 70, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: 0.06, duration: 0.3, ease: 'power3.out' }, 0)
-    .fromTo(sub, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.2 }, 0.22)
-    .to([...words, sub], { opacity: 0, y: -24, yPercent: 0, duration: 0.18, stagger: 0.01, ease: 'power2.in' }, 0.82);
+  // o título entra por tempo (uma vez, fluido) e só a saída acompanha a rolagem no fim da seção
+  const t1 = gsap.timeline({ paused: true });
+  t1.fromTo(words, { yPercent: 70, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: 0.07, duration: 0.8, ease: 'power3.out' }, 0)
+    .fromTo(sub, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 0.35);
+  const st1 = ScrollTrigger.create({ trigger: sec.intro, start: 'top 70%', onEnter: () => t1.play(), onLeaveBack: () => t1.reverse() });
+  if (st1.progress > 0 || scrollY > sec.intro.offsetTop - innerHeight * 0.7) t1.progress(1);
+  const t1o = gsap.fromTo([...words, sub], { opacity: 1, y: 0 }, { opacity: 0, y: -24, stagger: 0.01, ease: 'power2.in', immediateRender: false,
+    scrollTrigger: { trigger: sec.intro, start: 'bottom 140%', end: 'bottom 105%', scrub: 0.5 } });
+  textTweens.push(t1, st1, t1o);
   const l1 = $('.rebuild .l1'), l2 = $('.rebuild .l2');
   const t2 = gsap.timeline({ scrollTrigger: { trigger: sec.rebuild, start: 'top 70%', end: 'bottom bottom', scrub: 0.6 } });
   t2.fromTo(l1, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.25, ease: 'power3.out' }, 0.05)
@@ -610,7 +621,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=34'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=36'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
