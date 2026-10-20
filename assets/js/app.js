@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=30';
-import { EN, RUNTIME } from './i18n.js?v=30';
+import { drawFace } from './face.js?v=31';
+import { EN, RUNTIME } from './i18n.js?v=31';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -605,7 +605,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=30'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=31'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
@@ -722,21 +722,23 @@ $$('.swatch').forEach(b => b.addEventListener('click', () => {
 }));
 
 /* especificações: a placa 3D vive na faixa do topo; recua (zoom out) uma vez em 3 s e para */
-let chip3 = null, chipCv = null, chipT0 = 0, chipDone = false, chipRaf = false;
-const CHIP_POSE = (k) => { const m = mqMobile.matches; const d = m ? 4.6 : 3.9; return { ...DEF, set: 1, tx: 0, ty: 0, tz: 0, el: 52, az: -16, dist: d * (0.42 + 0.58 * k), fitA: 1, spin: 0, rim: 1.25 + 0.5 * (1 - k), bglow: 1, vis: 1, screen: 1, shiftX: 0, shiftY: 0 }; };
+let chip3 = null, chipCv = null, chipT0 = 0, chipVis = false, chipRaf = false;
+const CHIP_POSE = (k) => { const m = mqMobile.matches; const d = m ? 4.6 : 3.9; return { ...DEF, set: 1, tx: 0, ty: 0, tz: 0, el: 58, az: 0, dist: d * (0.42 + 0.58 * k), fitA: 1, spin: 0, rim: 1.25 + 0.5 * (1 - k), bglow: 1, vis: 1, screen: 1, shiftX: 0, shiftY: 0 }; };
 function chipFrame(now) {
   chipRaf = false; if (!chip3) return;
   const u = chipT0 ? Math.min(1, (now - chipT0) / 3000) : 0, k = 1 - Math.pow(1 - u, 3);
   chip3.render(CHIP_POSE(k), now, ZP);
-  if (chipT0 && u < 1) { chipRaf = true; requestAnimationFrame(chipFrame); } else if (chipT0) chipDone = true;
+  // o zoom acontece uma vez; depois a câmera fica parada e só o circuito pulsa, enquanto a faixa está na tela
+  if (chipT0 && (u < 1 || (chipVis && !mqReduce.matches && !document.hidden))) { chipRaf = true; requestAnimationFrame(chipFrame); }
 }
 function chipSize() { if (!chip3) return; const w = chipCv.clientWidth, h = chipCv.clientHeight; if (!w || !h) return; chip3.resize(w, h, Math.min(devicePixelRatio || 1, tier === 'high' ? 2 : 1.5)); if (!chipRaf) requestAnimationFrame(chipFrame); }
 function initChip3D(mod) {
   const band = $('.specs__chip'); if (!band || chip3) return;
   chipCv = document.createElement('canvas'); chipCv.className = 'specs__gl'; band.appendChild(chipCv);
   try { chip3 = mod.createWatch(chipCv, { faceCanvas, tier, backText: R().back }); } catch (e) { chipCv.remove(); chip3 = null; return; }
+  if (chip3.setChipRim) chip3.setChipRim(false);
   band.classList.add('is-3d'); chipSize(); addEventListener('resize', chipSize);
-  new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { band.classList.add('in'); if (!chipT0 && !mqReduce.matches) { chipT0 = performance.now(); requestAnimationFrame(chipFrame); } else if (mqReduce.matches) { chipT0 = 1; requestAnimationFrame(chipFrame); } ob.disconnect(); } }), { threshold: 0.3 }).observe(band);
+  new IntersectionObserver(es => es.forEach(e => { chipVis = e.isIntersecting; if (!chipVis) return; band.classList.add('in'); if (!chipT0) chipT0 = mqReduce.matches ? 1 : performance.now(); if (!chipRaf) { chipRaf = true; requestAnimationFrame(chipFrame); } }), { threshold: 0.15 }).observe(band);
 }
 { const chip = $('.specs__chip'); if (chip) new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { chip.classList.add('in'); ob.disconnect(); } }), { threshold: 0.35 }).observe(chip); }
 /* início */

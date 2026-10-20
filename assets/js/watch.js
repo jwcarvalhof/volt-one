@@ -335,7 +335,7 @@ function buildChipSet(mat) {
   const rim = new THREE.Mesh(new THREE.TorusGeometry(rimR, 0.16, 24, 200), mat.tiPolish);
   rim.rotation.x = Math.PI / 2; rim.position.y = dome.position.y + domeR * Math.cos(open); set.add(rim);
   const light = new THREE.PointLight(0x6b9bff, 3, 4, 2); light.position.set(0, 0.5, 0); set.add(light);
-  return { set, uni, light, sparks };
+  return { set, uni, light, sparks, dome, rim };
 }
 
 /* ---------- principal ---------- */
@@ -691,6 +691,7 @@ export function createWatch(canvas, { faceCanvas, tier = 'high', backText = 'VOL
     setFinish(i) { setFinishTargets(i); },
     isAnimating() { return finishMoving; },
     setCrown(a) { crownAngle = a; },
+    setChipRim(v) { chipSet.dome.visible = chipSet.rim.visible = v; },
     refreshFace() { faceTex.needsUpdate = true; },
     setBackText(text) {
       const old = parts.backRing.material.alphaMap; parts.backRing.material.alphaMap = backTextTexture(text); parts.backRing.material.needsUpdate = true; if (old) old.dispose();
