@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=27';
-import { EN, RUNTIME } from './i18n.js?v=27';
+import { drawFace } from './face.js?v=30';
+import { EN, RUNTIME } from './i18n.js?v=30';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -605,7 +605,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=27'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=30'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
@@ -613,6 +613,8 @@ async function boot3D() {
   catch (e) { console.warn('VOLT: falha no WebGL', e); three = null; goStatic(); return; }
   canvas.addEventListener('webglcontextlost', ev => { ev.preventDefault(); goStatic(); }, { once: true });
   buildTags();
+  initDet3D(mod);
+  initChip3D(mod);
   dpr = 0; sizeCanvas();
   running = true;
   if (window.gsap) { gsap.registerPlugin(ScrollTrigger); ScrollTrigger.config({ ignoreMobileResize: true }); if (stillDebug) gsap.ticker.lagSmoothing(0); }
@@ -655,7 +657,8 @@ addEventListener('load', () => { if (three) buildMaster(); });
 /* ---------------- detalhes: um item aberto por vez, com foco no relógio ---------------- */
 // cada item gira e aproxima o relógio até a parte de que fala (deslocamentos somados à pose da rolagem)
 const FOCUS = {
-  finish: { rx: 0, ry: 0, zoom: 1, tx: 0, ty: 0, tz: 0 },
+  base: { rx: 0, ry: 0, zoom: 1, tx: 0, ty: 0, tz: 0 },
+  finish: { rx: -6, ry: 34, zoom: 0.86, tx: 0, ty: 0.05, tz: 0 },
   size: { rx: 4, ry: 18, zoom: 1.12, tx: 0, ty: 0, tz: 0 },
   crown: { rx: 2, ry: -38, zoom: 0.5, tx: 1.0, ty: 0.12, tz: 0.4 },
   button: { rx: -6, ry: -48, zoom: 0.56, tx: 1.0, ty: -0.3, tz: 0.3 },
@@ -665,11 +668,39 @@ const FOCUS = {
 };
 const feats = $$('.feat');
 let fxTween = null, curFocus = 'finish', detVisible = true;
+// relógio 3D próprio da seção de detalhes: vive dentro da caixa e só se mexe nos cliques
+const dfx = { rx: 0, ry: 0, zoom: 1, tx: 0, ty: 0, tz: 0 };
+let det3 = null, detCanvas = null, detOn = false, detRaf = false, detUntil = 0;
+const DET_POSE = () => ({ ...DEF, rx: -10, ry: -30, el: 2, dist: 8.2, ty: 0.05, tz: -0.6, shiftX: 0, shiftY: 0, fitA: 1, spin: 0, glassI: 0.3, bgMix: 1, strap: 0, vis: 1, screen: 1 });
+function detFrame() {
+  detRaf = false;
+  if (!det3 || !detOn) return;
+  det3.render(DET_POSE(), performance.now(), ZP, dfx);
+  if (performance.now() < detUntil) { detRaf = true; requestAnimationFrame(detFrame); }
+}
+function detKick(ms = 400) { detUntil = Math.max(detUntil, performance.now() + ms); if (det3 && detOn && !detRaf) { detRaf = true; requestAnimationFrame(detFrame); } }
+function detSize() {
+  if (!det3) return;
+  const w = detCanvas.clientWidth, h = detCanvas.clientHeight; if (!w || !h) return;
+  det3.resize(w, h, Math.min(devicePixelRatio || 1, tier === 'high' ? 2 : 1.5)); detKick();
+}
+function initDet3D(mod) {
+  const shot = $('.det__shot'); if (!shot || det3) return;
+  detCanvas = document.createElement('canvas'); detCanvas.className = 'det__gl'; shot.appendChild(detCanvas);
+  try { det3 = mod.createWatch(detCanvas, { faceCanvas, tier, backText: R().back }); } catch (e) { detCanvas.remove(); det3 = null; return; }
+  shot.classList.add('is-3d');
+  detSize(); addEventListener('resize', detSize);
+  new IntersectionObserver(es => { detOn = es[0].isIntersecting; detKick(900); }, { rootMargin: '200px 0px' }).observe(shot);
+}
+// cada opção tem o seu movimento: giro até a coroa, ao botão, ao perfil, à traseira, à pulseira
+const FOCUS_EASE = { finish: 'power2.inOut', crown: 'back.out(1.25)', button: 'back.out(1.15)', durable: 'power3.inOut', charge: 'power4.inOut', strap: 'expo.inOut', base: 'power3.inOut' };
+const FOCUS_DUR = { finish: 1.6, crown: 1.5, button: 1.4, durable: 1.7, charge: 2.1, strap: 1.8, base: 1.4 };
 function focusTo(key) {
-  const f = FOCUS[detVisible ? key : 'finish'] || FOCUS.finish;
+  const f = FOCUS[key] || FOCUS.base;
   if (fxTween) fxTween.kill();
-  if (!window.gsap || mqReduce.matches) { Object.assign(fx, f); invalidate(); return; }
-  fxTween = gsap.to(fx, { ...f, duration: 1.3, ease: 'power3.inOut', onUpdate: invalidate });
+  if (!det3 || !window.gsap || mqReduce.matches) { Object.assign(dfx, f); detKick(); return; }
+  const d = FOCUS_DUR[key] || 1.5; detKick(d * 1000 + 150);
+  fxTween = gsap.to(dfx, { ...f, duration: d, ease: FOCUS_EASE[key] || 'power3.inOut', onComplete: () => detKick(250) });
 }
 function openFeat(el) {
   feats.forEach(f => {
@@ -677,8 +708,9 @@ function openFeat(el) {
     f.classList.toggle('open', open);
     f.querySelector('.feat__btn').setAttribute('aria-expanded', String(open));
   });
-  curFocus = el.classList.contains('open') ? el.dataset.focus : 'finish';
-  if (detShot) detShot.dataset.f = curFocus;
+  curFocus = el.classList.contains('open') ? el.dataset.focus : 'base';
+  if (detShot && !det3) detShot.dataset.f = curFocus;
+  focusTo(curFocus);
 }
 feats.forEach(f => f.querySelector('.feat__btn').addEventListener('click', () => openFeat(f)));
 const detShot = $('.det__shot'), detImgs = $$('.det__shot img');
@@ -686,9 +718,26 @@ $$('.swatch').forEach(b => b.addEventListener('click', () => {
   $$('.swatch').forEach(s => s.setAttribute('aria-pressed', String(s === b)));
   detImgs.forEach((im, k) => im.classList.toggle('is-active', k === +b.dataset.finish));
   if (three) { three.setFinish(+b.dataset.finish); invalidate(); }
+  if (det3) { det3.setFinish(+b.dataset.finish); detKick(2600); }
 }));
 
-/* especificações: a placa recua uma vez, em 3 s, quando aparece */
+/* especificações: a placa 3D vive na faixa do topo; recua (zoom out) uma vez em 3 s e para */
+let chip3 = null, chipCv = null, chipT0 = 0, chipDone = false, chipRaf = false;
+const CHIP_POSE = (k) => { const m = mqMobile.matches; const d = m ? 4.6 : 3.9; return { ...DEF, set: 1, tx: 0, ty: 0, tz: 0, el: 52, az: -16, dist: d * (0.42 + 0.58 * k), fitA: 1, spin: 0, rim: 1.25 + 0.5 * (1 - k), bglow: 1, vis: 1, screen: 1, shiftX: 0, shiftY: 0 }; };
+function chipFrame(now) {
+  chipRaf = false; if (!chip3) return;
+  const u = chipT0 ? Math.min(1, (now - chipT0) / 3000) : 0, k = 1 - Math.pow(1 - u, 3);
+  chip3.render(CHIP_POSE(k), now, ZP);
+  if (chipT0 && u < 1) { chipRaf = true; requestAnimationFrame(chipFrame); } else if (chipT0) chipDone = true;
+}
+function chipSize() { if (!chip3) return; const w = chipCv.clientWidth, h = chipCv.clientHeight; if (!w || !h) return; chip3.resize(w, h, Math.min(devicePixelRatio || 1, tier === 'high' ? 2 : 1.5)); if (!chipRaf) requestAnimationFrame(chipFrame); }
+function initChip3D(mod) {
+  const band = $('.specs__chip'); if (!band || chip3) return;
+  chipCv = document.createElement('canvas'); chipCv.className = 'specs__gl'; band.appendChild(chipCv);
+  try { chip3 = mod.createWatch(chipCv, { faceCanvas, tier, backText: R().back }); } catch (e) { chipCv.remove(); chip3 = null; return; }
+  band.classList.add('is-3d'); chipSize(); addEventListener('resize', chipSize);
+  new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { band.classList.add('in'); if (!chipT0 && !mqReduce.matches) { chipT0 = performance.now(); requestAnimationFrame(chipFrame); } else if (mqReduce.matches) { chipT0 = 1; requestAnimationFrame(chipFrame); } ob.disconnect(); } }), { threshold: 0.3 }).observe(band);
+}
 { const chip = $('.specs__chip'); if (chip) new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { chip.classList.add('in'); ob.disconnect(); } }), { threshold: 0.35 }).observe(chip); }
 /* início */
 setTimeout(() => { if (!three) heroIn(); }, 9000); // garantia: o texto da hero aparece mesmo se o 3D não subir
