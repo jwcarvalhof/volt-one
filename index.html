@@ -161,6 +161,15 @@ section{position:relative}
 :root{--outer:#1d1d1f;--fx:clamp(16px,12.5vw,260px);--ft:calc(var(--nav-h) + 12px);--fb:clamp(16px,13vh,140px);--fi:clamp(28px,4.6vw,88px)}
 .framed .sticky::before{content:"";position:absolute;z-index:0;pointer-events:none;inset:var(--ft) var(--fx) var(--fb);border-radius:clamp(20px,2vw,30px);box-shadow:0 0 0 200vmax var(--outer)}
 .framed .sticky > *{position:relative;z-index:1}
+.details .sticky::before{background:#060608}
+.det__shot{grid-column:2;grid-row:1;justify-self:center;align-self:center;position:relative;width:min(100%,62vh);aspect-ratio:1;margin:0;overflow:hidden;-webkit-mask-image:radial-gradient(closest-side,#000 82%,transparent);mask-image:radial-gradient(closest-side,#000 82%,transparent)}
+.det__shot img{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .6s var(--ease),transform 1.1s cubic-bezier(.6,0,.2,1);transform-origin:var(--ox,50%) var(--oy,50%);transform:scale(var(--z,1))}
+.det__shot img.is-active{opacity:1}
+.det__shot[data-f="crown"]{--z:2;--ox:84%;--oy:42%}
+.det__shot[data-f="button"]{--z:2;--ox:82%;--oy:56%}
+.det__shot[data-f="durable"]{--z:1.45;--ox:70%;--oy:48%}
+.det__shot[data-f="charge"]{--z:1.25;--ox:50%;--oy:55%}
+.det__shot[data-f="strap"]{--z:1.6;--ox:52%;--oy:88%}
 .explode__panel{align-self:center;min-width:0;max-width:360px}
 .steps{display:grid}
 .step{grid-area:1/1;opacity:0;transform:translateY(14px);filter:blur(4px);transition:opacity .55s var(--ease),transform .55s var(--ease),filter .55s var(--ease);pointer-events:none}
@@ -208,7 +217,7 @@ section{position:relative}
 /* ---------- 7 detalhes: um item aberto por vez ---------- */
 .details{height:180vh}
 .details .sticky{display:grid;grid-template-columns:minmax(300px,30vw) 1fr;align-items:center;padding:var(--ft) calc(var(--fx) + var(--fi)) var(--fb)}
-.details__col{min-width:0;justify-self:start;width:min(100%,330px)}
+.details__col{grid-column:1;grid-row:1;min-width:0;justify-self:start;width:min(100%,330px)}
 .details__col h2{font-size:clamp(26px,2.2vw,34px);font-weight:500;max-width:16ch;margin:0 0 clamp(20px,3vh,32px)}
 .feats{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
 .feat{background:#1d1d1f;border-radius:26px;max-width:100%;transition:background .4s var(--ease)}
@@ -295,8 +304,10 @@ section{position:relative}
 .rec.playing .rec__dots button.on i::after{animation:fdot var(--dur,5.5s) linear forwards}
 @keyframes fdot{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 /* ---------- 9 especificações sobre o chip ---------- */
-.specs{padding:clamp(160px,26vh,260px) var(--gutter) clamp(160px,24vh,240px);text-align:center}
-.specs::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,6,12,0),rgba(4,6,12,.45) 16%,rgba(4,6,12,.55) 40%,rgba(4,6,12,.82) 62%,rgba(4,6,12,.82) 90%,rgba(4,6,12,0))}
+.specs{padding:0 var(--gutter) clamp(160px,24vh,240px);text-align:center;background:#000}
+.specs__chip{margin:0 calc(-1 * var(--gutter)) clamp(40px,7vh,80px);overflow:hidden;height:clamp(300px,58vh,640px);display:flex;justify-content:center}
+.specs__chip img{height:100%;width:auto;max-width:none;opacity:0;transform:scale(1.35);transition:opacity 1.2s var(--ease),transform 3s cubic-bezier(.2,.7,.2,1)}
+.specs__chip.in img{opacity:1;transform:none}
 .specs > *{position:relative}
 .specs__head{max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
 .specs__head h2{font-size:clamp(38px,4.8vw,72px);letter-spacing:-.04em;margin:20px 0 20px}
@@ -401,7 +412,9 @@ section{position:relative}
   .mat{padding:20px}
   .rebuild{height:210vh}
   .details{height:auto}
-  .details .sticky{position:relative;height:auto;min-height:100svh;grid-template-columns:1fr;align-items:end;padding:58svh 22px 30px}
+  .details .sticky{position:relative;height:auto;min-height:100svh;grid-template-columns:1fr;align-items:start;padding:calc(var(--nav-h) + 20px) 22px 30px;gap:8px}
+  .det__shot{grid-column:1;grid-row:1;width:min(100%,46svh)}
+  .details__col{grid-row:2}
   .experience .sticky{grid-template-columns:1fr;gap:36px;padding:90px var(--gutter)}
   .exp__frame{width:100%}
   .exp__copy{grid-column:1}
@@ -496,13 +509,13 @@ section{position:relative}
         <h2 id="mat-title" data-i18n="matTitle">Escolhas de engenharia que dá para ver de perto.</h2>
       </div>
       <div class="mat__stack">
-        <article class="mat glass" data-m="0"><p class="eyebrow" data-i18n="m1i">Vidro</p><h3 data-i18n="m1t">Safira com borda chanfrada</h3>
+        <article class="mat glass" data-m="0"><h3 data-i18n="m1t">Safira com borda chanfrada</h3>
           <p data-i18n="m1p">A borda levemente inclinada <strong>quebra o reflexo na lateral</strong> e deixa o vidro rente à moldura. A luz rasante passa pela superfície sem distorcer o mostrador.</p></article>
-        <article class="mat glass" data-m="1"><p class="eyebrow" data-i18n="m2i">Lateral</p><h3 data-i18n="m2t">Titânio escovado</h3>
+        <article class="mat glass" data-m="1"><h3 data-i18n="m2t">Titânio escovado</h3>
           <p data-i18n="m2p">O acabamento escovado <strong>disfarça marcas pequenas do dia a dia</strong> e segura a luz em linhas finas, em vez de espelhar tudo em volta.</p></article>
-        <article class="mat glass" data-m="2"><p class="eyebrow" data-i18n="m3i">Coroa</p><h3 data-i18n="m3t">Serrilhado com anel azul</h3>
+        <article class="mat glass" data-m="2"><h3 data-i18n="m3t">Serrilhado com anel azul</h3>
           <p data-i18n="m3p">O serrilhado dá aderência ao toque e o anel azul é <strong>o único ponto de cor da caixa</strong>. É pela coroa que você navega pela interface.</p></article>
-        <article class="mat glass" data-m="3"><p class="eyebrow" data-i18n="m4i">Traseira</p><h3 data-i18n="m4t">Cerâmica com janela de safira</h3>
+        <article class="mat glass" data-m="3"><h3 data-i18n="m4t">Cerâmica com janela de safira</h3>
           <p data-i18n="m4p">A cerâmica fica confortável na pele e <strong>não bloqueia sinais sem fio</strong>. Sobre os sensores, uma janela de safira protege a leitura óptica.</p></article>
       </div>
     </div>
@@ -518,6 +531,7 @@ section{position:relative}
   <!-- 7 · DETALHES -->
   <section class="details framed" id="detalhes" aria-labelledby="det-title">
     <div class="sticky">
+      <figure class="det__shot" aria-hidden="true"><img class="is-active" src="assets/img/det-f0.webp" alt="" width="1200" height="1200" loading="lazy" decoding="async"><img src="assets/img/det-f1.webp" alt="" width="1200" height="1200" loading="lazy" decoding="async"><img src="assets/img/det-f2.webp" alt="" width="1200" height="1200" loading="lazy" decoding="async"></figure>
       <div class="details__col">
         <h2 id="det-title" class="sr-only" data-i18n="detTitle">Feito de pequenas decisões.</h2>
         <div class="feats" id="feats">
@@ -637,6 +651,7 @@ section{position:relative}
   </section>
   <!-- 9 · ESPECIFICAÇÕES -->
   <section class="specs center" id="especificacoes" aria-labelledby="specs-title">
+    <figure class="specs__chip" aria-hidden="true"><img src="assets/img/chip-top.webp" alt="" width="2400" height="1100" loading="lazy" decoding="async"></figure>
     <div class="specs__head">
       <h2 id="specs-title" data-i18n="specTitle">Pensado por dentro, medido para o seu dia.</h2>
       <p data-i18n="specLede">O VOLT One é um conceito. Os valores abaixo são metas de design coerentes entre si, não medições de um produto fabricado.</p>
@@ -702,6 +717,6 @@ section{position:relative}
 
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-<script type="module" src="assets/js/app.js?v=26"></script>
+<script type="module" src="assets/js/app.js?v=27"></script>
 </body>
 </html>

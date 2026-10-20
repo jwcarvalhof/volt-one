@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=26';
-import { EN, RUNTIME } from './i18n.js?v=26';
+import { drawFace } from './face.js?v=27';
+import { EN, RUNTIME } from './i18n.js?v=27';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -422,29 +422,13 @@ function buildMaster() {
   add(R.top + 0.94 * R.r, P.rEnd, 'power2.out');
   add(end(R) - vh * 0.3, P.rEnd);
   add(end(R) - 1, H(P.rEnd), 'power1.in');
-  // detalhes: o relógio já está dentro da caixa e entra e sai junto com ela
-  add(end(R), P.det);
-  add(end(D) + vh, P.det);
-  add(end(D) + vh + 1, P.expHidden);
-  frameRange = [end(R), D.top, end(D), end(D) + vh];
+  // detalhes em diante: o relógio é uma foto dentro de cada seção, o 3D fica apagado
+  add(end(R), H(P.rEnd));
+  frameRange = null;
   passes = T;
   // troca de cena por um apagar e acender, sem a câmera atravessar o espaço
   // o relógio da experiência apaga antes da seção de recursos (fotos); o chip só acende nas especificações
-  const F = L.feats;
-  const a0 = F.top - vh * 0.75, a1 = F.top - vh * 0.3, a2 = Sp.top - vh * 0.1;
-  const b0 = Math.max(Sp.top + vh * 0.25 + 10, Sp.top + Sp.h - vh * 0.75), b1 = Math.max(b0 + 10, L.family.top - vh * 0.55);
-  add(a1, P.expHidden);
-  add(a1 + 1, P.chipAHidden);
-  // a placa chega de perto e recua (zoom out) até o enquadramento final
-  const zA = (k, v) => ({ ...P.chipA, dist: P.chipA.dist * k, vis: v });
-  add(Math.max(a1 + 2, Sp.top - vh * 0.6), zA(0.42, 0));
-  add(Sp.top - vh * 0.35, zA(0.5, 1), 'power1.out');
-  add(Sp.top + vh * 0.25, P.chipA, 'power2.out');
-  add(b0, P.chipB, 'sine.inOut');
-  add(b1, P.chipBHidden, 'power1.in');
-  // o encerramento é uma fotografia: o 3D termina apagado
-  add(b1 + 1, P.closeHidden);
-  add(L.max, P.closeHidden);
+  add(L.max, H(P.rEnd));
   K.sort((a, b) => a[0] - b[0]);
   const tl = gsap.timeline({ paused: true, onUpdate: () => { lastScrub = performance.now(); invalidate(); } });
   for (let i = 0; i < K.length - 1; i++) {
@@ -621,7 +605,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=26'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=27'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
@@ -694,14 +678,18 @@ function openFeat(el) {
     f.querySelector('.feat__btn').setAttribute('aria-expanded', String(open));
   });
   curFocus = el.classList.contains('open') ? el.dataset.focus : 'finish';
-  focusTo(curFocus);
+  if (detShot) detShot.dataset.f = curFocus;
 }
 feats.forEach(f => f.querySelector('.feat__btn').addEventListener('click', () => openFeat(f)));
+const detShot = $('.det__shot'), detImgs = $$('.det__shot img');
 $$('.swatch').forEach(b => b.addEventListener('click', () => {
   $$('.swatch').forEach(s => s.setAttribute('aria-pressed', String(s === b)));
+  detImgs.forEach((im, k) => im.classList.toggle('is-active', k === +b.dataset.finish));
   if (three) { three.setFinish(+b.dataset.finish); invalidate(); }
 }));
 
+/* especificações: a placa recua uma vez, em 3 s, quando aparece */
+{ const chip = $('.specs__chip'); if (chip) new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { chip.classList.add('in'); ob.disconnect(); } }), { threshold: 0.35 }).observe(chip); }
 /* início */
 setTimeout(() => { if (!three) heroIn(); }, 9000); // garantia: o texto da hero aparece mesmo se o 3D não subir
 applyLang(lang, true);
