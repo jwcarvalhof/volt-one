@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=31';
-import { EN, RUNTIME } from './i18n.js?v=31';
+import { drawFace } from './face.js?v=32';
+import { EN, RUNTIME } from './i18n.js?v=32';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -340,7 +340,7 @@ function heroIn() { root.classList.add('hero-in'); }
 // chega reto e apagado, com luz baixa; depois gira até ficar de lado e só então o texto aparece
 function introPose() {
   if (!intro.t0) { introScr = 1; return S; }
-  const s = intro.s, A = 1.3, B = 2.6;
+  const s = intro.s, A = 0.3, B = 0.7;
   if (s >= A + B) { intro.t0 = 0; introScr = 1; heroIn(); return S; }
   const F = { rx: -6, ry: -12, rz: 0, el: 2, shiftX: 0, shiftY: S.shiftY + 0.04, dist: S.dist + 0.8 };
   let k, vis, scr, d0;
@@ -487,7 +487,7 @@ function loop(t) {
   const dt = lastFrameT ? t - lastFrameT : 16; lastFrameT = t;
   const k = 1 - Math.pow(1 - 0.08, Math.min(100, dt) / 16.667);
   par.x += (parT.x - par.x) * k; par.y += (parT.y - par.y) * k;
-  if (intro.t0) intro.s += Math.min(dt, 34) / 1000; // passo limitado: em aparelho lento a entrada fica mais lenta, nunca pula
+  if (intro.t0) intro.s += Math.min(dt, 60) / 1000; // passo limitado: em aparelho lento a entrada fica mais lenta, nunca pula
   const RS = introPose();
   frameShift();
   const op = Math.round(clamp(RS.vis) * 1000) / 1000;
@@ -605,7 +605,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=31'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=32'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
@@ -624,7 +624,7 @@ async function boot3D() {
   addEventListener('resize', onResize);
   renderCrown();
   if (window.gsap && !mqReduce.matches && !stillDebug && scrollY < innerHeight * 0.5) {
-    intro.t0 = 1; intro.s = -0.15;
+    intro.t0 = 1; intro.s = 0;
   } else heroIn();
   invalidate();
   requestAnimationFrame(() => requestAnimationFrame(() => { root.classList.remove('is-3d-loading'); root.classList.add('is-3d-ready'); }));
