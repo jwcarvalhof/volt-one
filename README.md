@@ -1,5 +1,5 @@
-<p align="center"><img src="assets/cover/cover3-pt.jpg" alt="VOLT One" width="100%"></p>
-<p align="center"><img src="assets/cover/cover3-en.jpg" alt="VOLT One (EN)" width="100%"></p>
+<p align="center"><img src="assets/cover/cover4-pt.jpg" alt="VOLT One" width="100%"></p>
+<p align="center"><img src="assets/cover/cover4-en.jpg" alt="VOLT One (EN)" width="100%"></p>
 
 # VOLT One
 
