@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=33';
-import { EN, RUNTIME } from './i18n.js?v=33';
+import { drawFace } from './face.js?v=34';
+import { EN, RUNTIME } from './i18n.js?v=34';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -350,7 +350,7 @@ function introPose() {
   return { ...S, rx: lerp(F.rx, S.rx, k), ry: lerp(F.ry, S.ry, k), rz: lerp(F.rz, S.rz, k), el: lerp(F.el, S.el, k),
     shiftX: lerp(F.shiftX, S.shiftX, k), shiftY: lerp(F.shiftY, S.shiftY, k), dist: lerp(d0, S.dist, k), vis: S.vis * vis };
 }
-let three = null, running = false, rafOn = false, master = null, masterST = null, passes = [], frameRange = null;
+let three = null, running = false, rafOn = false, master = null, masterST = null, passes = [], frameRange = null, heroEnd = 0;
 if (stillDebug) window.__volt = { S, get L() { return L; }, get tl() { return master; } };
 let canvas = $('#gl');
 const par = { x: 0, y: 0 }, parT = { x: 0, y: 0 };
@@ -406,7 +406,10 @@ function buildMaster() {
   const pass = (a, b, from, to) => { const m = (a + b) / 2; T.push([a, b]); add(m - 1, H(from)); add(m, H(to)); add(b, to); };
   const end = s => s.top + s.r;
   add(0, P.hero);
-  pass(0, I.top, P.hero, P.approach);
+  // o relógio da hero fica preso à hero: sobe com ela e sai da tela junto (sem fade)
+  add(Math.max(1, I.top - 2), P.hero);
+  add(I.top - 1, H(P.approach));
+  heroEnd = I.top;
   // nesta seção o relógio se desmonta aos poucos, pronto para a seção seguinte
   add(I.top + 0.25 * I.r, P.approach);
   add(end(I), P.introOpen, 'power1.inOut');
@@ -450,6 +453,8 @@ let lastFrame = '';
 // na seção de detalhes o palco 3D fica recortado na caixa preta e rola junto com ela na entrada e na saída
 function frameShift() {
   let tf = '', cp = '';
+  const sy = scrollY;
+  if (heroEnd && sy > 0 && sy < heroEnd + 4) tf = `translate3d(0,${-Math.round(Math.min(sy, heroEnd))}px,0)`;
   if (master && L && frameRange) {
     const y = master.progress() * L.max, [a, b, c, d] = frameRange;
     if (y >= a && y <= d) {
@@ -605,7 +610,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=33'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=34'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
@@ -741,6 +746,7 @@ function initChip3D(mod) {
   new IntersectionObserver(es => es.forEach(e => { chipVis = e.isIntersecting; if (!chipVis) return; band.classList.add('in'); if (!chipT0) chipT0 = mqReduce.matches ? 1 : performance.now(); if (!chipRaf) { chipRaf = true; requestAnimationFrame(chipFrame); } }), { threshold: 0.15 }).observe(band);
 }
 { const chip = $('.specs__chip'); if (chip) new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { chip.classList.add('in'); ob.disconnect(); } }), { threshold: 0.35 }).observe(chip); }
+addEventListener('scroll', () => { if (three && running) frameShift(); }, { passive: true });
 /* início */
 setTimeout(() => { if (!three) heroIn(); }, 9000); // garantia: o texto da hero aparece mesmo se o 3D não subir
 applyLang(lang, true);
