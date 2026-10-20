@@ -3,8 +3,8 @@
    o objeto de estado S entre poses ancoradas nas seções. O loop de render só roda quando algo muda
    e dorme quando nada se move. Sem WebGL, a página mostra uma imagem estática, sem nenhum botão de troca. */
 
-import { drawFace } from './face.js?v=32';
-import { EN, RUNTIME } from './i18n.js?v=32';
+import { drawFace } from './face.js?v=33';
+import { EN, RUNTIME } from './i18n.js?v=33';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -335,12 +335,12 @@ const S = { ...DEF, vis: 0, screen: 1 };
 const intro = { t0: 0, s: 0 };
 let introScr = 1;
 const lerp = (a, b, k) => a + (b - a) * k;
-const eio = u => u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const eio = u => -(Math.cos(Math.PI * u) - 1) / 2; // seno: começa e termina macio
 function heroIn() { root.classList.add('hero-in'); }
 // chega reto e apagado, com luz baixa; depois gira até ficar de lado e só então o texto aparece
 function introPose() {
   if (!intro.t0) { introScr = 1; return S; }
-  const s = intro.s, A = 0.3, B = 0.7;
+  const s = intro.s, A = 0.4, B = 1.6;
   if (s >= A + B) { intro.t0 = 0; introScr = 1; heroIn(); return S; }
   const F = { rx: -6, ry: -12, rz: 0, el: 2, shiftX: 0, shiftY: S.shiftY + 0.04, dist: S.dist + 0.8 };
   let k, vis, scr, d0;
@@ -605,7 +605,7 @@ async function boot3D() {
   root.classList.add('is-3d-loading');
   await fontsReady();
   let mod;
-  try { mod = await import('./watch.js?v=32'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
+  try { mod = await import('./watch.js?v=33'); } catch (e) { console.warn('VOLT: 3D indisponível', e); goStatic(); return; }
   faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = tier === 'high' ? 2048 : 1536;
   drawFace(faceCanvas, faceMode, new Date(), lang);
   const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
