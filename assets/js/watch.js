@@ -271,6 +271,26 @@ function buildChipSet(mat) {
   chip.position.y = 0.07; set.add(chip);
   const lid = new THREE.Mesh(new THREE.RoundedBoxGeometry(0.78, 0.02, 0.56, 2, 0.01), new THREE.MeshPhysicalMaterial({ color: 0x8e98a8, metalness: 1, roughness: 0.22 }));
   lid.position.y = 0.135; set.add(lid);
+  // marcação gravada a laser na tampa: fosca e um pouco mais escura que o metal polido
+  {
+    const c = document.createElement('canvas'); c.width = 1024; c.height = 736; const g = c.getContext('2d');
+    g.fillStyle = '#000'; g.fillRect(0, 0, c.width, c.height);
+    g.fillStyle = '#fff'; g.strokeStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    g.font = '600 236px Sora, "Inter", sans-serif';
+    if (g.letterSpacing !== undefined) g.letterSpacing = '6px';
+    g.fillText('VOLT', 512, 420);
+    g.font = '600 74px Sora, "Inter", sans-serif'; if (g.letterSpacing !== undefined) g.letterSpacing = '4px';
+    g.fillText('V1', 512, 540);
+    g.globalAlpha = 0.55; g.lineWidth = 3;
+    g.beginPath(); g.roundRect ? g.roundRect(40, 40, 944, 656, 26) : g.rect(40, 40, 944, 656); g.stroke();
+    g.beginPath(); g.arc(92, 92, 14, 0, Math.PI * 2); g.fill();
+    g.globalAlpha = 1;
+    const tex = new THREE.CanvasTexture(c); tex.anisotropy = 8;
+    const mark = new THREE.Mesh(new THREE.PlaneGeometry(0.76, 0.546), new THREE.MeshPhysicalMaterial({
+      color: 0x2a303c, metalness: 0.6, roughness: 0.62, alphaMap: tex, transparent: true, depthWrite: false,
+      polygonOffset: true, polygonOffsetFactor: -2 }));
+    mark.rotation.x = -Math.PI / 2; mark.position.y = 0.1452; set.add(mark);
+  }
   // halo retangular em volta do chip
   const halo = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 1.45), new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: uni,
